@@ -76,8 +76,8 @@ layer(base);
   --color-gray-500: #667085;
   --color-gray-600: #475467;
   --color-gray-700: #344054;
-  --color-gray-800: #1d2939;
-  --color-gray-900: #101828;
+  --color-gray-800: #0F0909FF;
+  --color-gray-900: #000;
   --color-gray-950: #0c111d;
   --color-gray-dark: #1a2231;
 
