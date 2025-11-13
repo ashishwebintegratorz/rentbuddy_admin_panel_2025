@@ -49,8 +49,112 @@ const navItems: NavItem[] = [
   {
     name: "Tables",
     icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false },
+     
+    ],
   },
+  {
+    name:"Customers",
+    path:"/customers",
+    icon:<UserCircleIcon />
+    
+  },
+  {
+    name:"Orders",
+    path:"/orders",
+    icon:<BoxCubeIcon/>
+
+  },
+  {
+    name:"Barcode",
+    path:"/barcode",
+    icon:<CalenderIcon/>
+
+  },
+  {
+    name:"Subscriptions",
+    path:"/subscriptions",
+    icon:<PlugInIcon/>
+
+  },
+  {
+    name:"Payments",
+    path:"/Payments",
+    icon:<PieChartIcon/>
+
+  },
+  {
+    name:"Invoice",
+    path:"/Invoice",
+    icon:<CalenderIcon/>
+
+  },
+  {
+    name:"Documents",
+    path:"/Documents",
+    icon:<CalenderIcon/>
+
+  },
+  {
+    name:"Recurring Payments",
+    path:"/recurring-payments",
+    icon:<CalenderIcon/>
+
+  },
+  {
+    name:"Return",
+    path:"/return",
+    icon:<GridIcon/>
+
+  },
+  {
+    name:"Refund",
+    path:"/refund",
+    icon:<GridIcon/>
+
+  },
+  {
+    name:"Products",
+    path:"/Products",
+    icon:<BoxCubeIcon/>
+
+  },
+  {
+    name:"packages",
+    path:"/packages",
+    icon:<CalenderIcon/>
+
+  },
+  {
+    name:"Repair",
+    path:"/repair",
+    icon:<PieChartIcon/>
+
+  },
+  {
+    name:"Track",
+    path:"/track",
+    icon:<PlugInIcon/>
+
+  },
+  {
+    name:"Rent History",
+    path:"/rent-history",
+    icon:<CalenderIcon/>
+
+  },
+  {
+    name:"Complaints",
+    path:"/complaints",
+    icon:<BoxCubeIcon/>
+  },
+  {
+    name:"Defaulters",
+    path:"/defaulters",
+    icon:<BoxCubeIcon/>
+  },
+  
+  
   {
     name: "Pages",
     icon: <PageIcon />,

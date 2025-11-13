@@ -13,6 +13,15 @@ import LineChart from "./pages/Charts/LineChart";
 import BarChart from "./pages/Charts/BarChart";
 import Calendar from "./pages/Calendar";
 import BasicTables from "./pages/Tables/BasicTables";
+import Customers from "./pages/Tables/Customers";
+import Orders from "./pages/Tables/Orders";
+import Barcode from "./pages/Tables/Barcode";
+import Subscription from "./pages/Tables/Subscription";
+import Payments from "./pages/Tables/Payments";
+import Invoice from   "./pages/Tables/Invoice";
+import Document from "./pages/Tables/Document";
+import Recurring from "./pages/Tables/Recurring";
+
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
@@ -39,6 +48,14 @@ export default function App() {
 
             {/* Tables */}
             <Route path="/basic-tables" element={<BasicTables />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/barcode" element={<Barcode />} />
+            <Route path="/subscriptions" element={<Subscription />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/invoice" element={<Invoice />} />
+            <Route path="/documents" element={<Document />} />
+            <Route path="/recurring" element={<Recurring />} />
 
             {/* Ui Elements */}
             <Route path="/alerts" element={<Alerts />} />
