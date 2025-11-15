@@ -27,6 +27,7 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import Product from "./pages/Tables/Product";
 
 export default function App() {
   return (
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/customers" element={<Customers />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/barcode" element={<Barcode />} />
+            <Route path="/products" element={<Product/>} />
             <Route path="/subscriptions" element={<Subscription />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/invoice" element={<Invoice />} />

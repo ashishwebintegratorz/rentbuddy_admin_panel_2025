@@ -1,9 +1,15 @@
-import React from 'react'
+import React from "react";
+import OrderTableOne from "../../components/tables/OrderTableOne";
 
 const Orders = () => {
   return (
-    <div>Orders</div>
-  )
-}
+    <div className="p-4">
+      <h1 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+        Orders
+      </h1>
+      <OrderTableOne />
+    </div>
+  );
+};
 
-export default Orders
+export default Orders;

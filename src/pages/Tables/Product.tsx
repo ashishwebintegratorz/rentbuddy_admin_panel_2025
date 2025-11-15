@@ -1,15 +1,15 @@
 import React from "react";
-import BarcodeTableOne from "../../components/tables/BarcodeTableOne";
+import ProductTableOne from "../../components/tables/ProductTableOne";
 
-const Barcode = () => {
+const Product = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-white">
-        Barcode Management
+        Product Management
       </h1>
-      <BarcodeTableOne />
+      <ProductTableOne />
     </div>
   );
 };
 
-export default Barcode;
+export default Product;

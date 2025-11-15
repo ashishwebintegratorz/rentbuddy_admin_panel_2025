@@ -8,79 +8,78 @@ import {
   TableRow,
 } from "../ui/table";
 
-export default function CustomerTableOne() {
-  const [customers, setCustomers] = useState<
+export default function OrderTableOne() {
+  const [orders, setOrders] = useState<
     {
-      name: string;
-      img: string;
-      customerId: string;
-      createdDate: string;
+      orderId: string;
+      customerName: string;
       email: string;
-      phonenumber: string;
-      subscription: string;
-      action: number;
+      amount: number;
+      status: string;
+      paymentType: string;
+      createdDate: string;
     }[]
   >([]);
+
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const customersPerPage = 10;
+  const ordersPerPage = 10;
 
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
   useEffect(() => {
     axios
-      .get(`${BASE_API_URL}/user/getAllCustomers`)
+      .get(`${BASE_API_URL}/orders/getOrders`)
       .then((res) => {
-        const fetched = res.data.data.map((cust: any) => ({
-          name: cust.username,
-          img: "/images/user/user-17.jpg",
-          customerId: cust.customerId,
-          createdDate: new Date(cust.createdAt).toLocaleDateString("en-IN", {
+        const fetched = res.data.data.map((order: any) => ({
+          orderId: order.orderId,
+          customerName: order.userId?.username || "Unknown",
+          email: order.userId?.email || "N/A",
+          amount: order.totalAmount,
+          status: order.status || "Pending",
+          paymentType: order.paymentType || "N/A",
+          createdDate: new Date(order.createdAt).toLocaleDateString("en-IN", {
             day: "2-digit",
             month: "short",
             year: "numeric",
           }),
-          email: cust.email,
-          phonenumber: cust.phone,
-          subscription: cust.isSubscribed ? "Active" : "Inactive",
-          action: 1,
         }));
-        setCustomers(fetched);
+        setOrders(fetched);
       })
-      .catch((err) => console.error("Error fetching customers:", err));
+      .catch((err) => console.error("Error fetching orders:", err));
   }, [BASE_API_URL]);
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`${BASE_API_URL}/user/deleteCustomer/${id}`);
-      setCustomers((prev) => prev.filter((cust) => cust.customerId !== id));
+      await axios.delete(`${BASE_API_URL}/order/deleteOrder/${id}`);
+      setOrders((prev) => prev.filter((order) => order.orderId !== id));
     } catch (err) {
       console.error("Delete failed:", err);
     }
   };
 
-  const filtered = customers.filter(
-    (cust) =>
-      cust.name.toLowerCase().includes(search.toLowerCase()) ||
-      cust.email.toLowerCase().includes(search.toLowerCase()) ||
-      cust.customerId.toLowerCase().includes(search.toLowerCase())
+  const filtered = orders.filter(
+    (order) =>
+      order.customerName.toLowerCase().includes(search.toLowerCase()) ||
+      order.email.toLowerCase().includes(search.toLowerCase()) ||
+      order.orderId.toLowerCase().includes(search.toLowerCase())
   );
 
-  const indexOfLast = currentPage * customersPerPage;
-  const indexOfFirst = indexOfLast - customersPerPage;
+  const indexOfLast = currentPage * ordersPerPage;
+  const indexOfFirst = indexOfLast - ordersPerPage;
   const current = filtered.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(filtered.length / customersPerPage);
+  const totalPages = Math.ceil(filtered.length / ordersPerPage);
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5">
       {/* Header with Search */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Customers
+          Orders
         </h2>
         <input
           type="text"
-          placeholder="Search by name, email, or ID..."
+          placeholder="Search by order ID, name, or email..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -96,26 +95,29 @@ export default function CustomerTableOne() {
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
             <TableRow>
               <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
-                Customer
+                Order ID
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
-                Customer ID
-              </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
-                Created Date
+                Customer Name
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
                 Email
               </TableCell>
               <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
-                Phone
+                Amount
               </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold  dark:text-gray-400">
-                Subscription
+              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
+                Status
+              </TableCell>
+              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
+                Payment Type
+              </TableCell>
+              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
+                Date
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 text-gray-700 font-semibold text-center  dark:text-gray-400"
+                className="px-5 py-3 text-gray-700 font-semibold text-center dark:text-gray-400"
               >
                 Action
               </TableCell>
@@ -124,46 +126,42 @@ export default function CustomerTableOne() {
 
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {current.length > 0 ? (
-              current.map((cust) => (
-                <TableRow key={cust.customerId}>
-                  <TableCell className="px-5 py-4 text-start">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={cust.img}
-                        alt={cust.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <span className="font-medium text-gray-700 dark:text-white/90">
-                        {cust.name}
-                      </span>
-                    </div>
+              current.map((order) => (
+                <TableRow key={order.orderId}>
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
+                    {order.orderId}
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
-                    {cust.customerId}
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-white/90">
+                    {order.customerName}
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
-                    {cust.createdDate}
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
+                    {order.email}
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
-                    {cust.email}
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400 text-center">
+                    ₹{order.amount}
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
-                    {cust.phonenumber}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
+                  <TableCell className="px-4 py-3">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        cust.subscription === "Active"
+                        order.status.toLowerCase() === "completed"
                           ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                          : order.status.toLowerCase() === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-gray-100 text-gray-700"
                       }`}
                     >
-                      {cust.subscription}
+                      {order.status}
                     </span>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
+                    {order.paymentType}
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
+                    {order.createdDate}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-center">
                     <button
-                      onClick={() => handleDelete(cust.customerId)}
+                      onClick={() => handleDelete(order.orderId)}
                       className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
                     >
                       Delete
@@ -174,10 +172,10 @@ export default function CustomerTableOne() {
             ) : (
               <TableRow>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   className="text-center py-6 text-gray-500 italic"
                 >
-                  No customers found.
+                  No orders found.
                 </td>
               </TableRow>
             )}
