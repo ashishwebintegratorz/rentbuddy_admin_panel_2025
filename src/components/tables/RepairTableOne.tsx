@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { MoreVertical, Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus } from "lucide-react";
 import Button from "../ui/button/Button";
 import { toast } from "react-toastify";
 import ModalWrapper from "../../layout/ModalWrapper";
@@ -69,7 +69,7 @@ const RepairTableOne: React.FC = () => {
     const matchesSearch =
       !search ||
       [p.returnId, p.productId, p.issueReported].some((field) =>
-        field.toLowerCase().includes(search.toLowerCase())
+        field?.toLowerCase().includes(search.toLowerCase())
       );
     const matchesStatus =
       !statusFilter || p.status.toLowerCase() === statusFilter.toLowerCase();
@@ -189,9 +189,8 @@ const RepairTableOne: React.FC = () => {
 
   return (
     <>
-      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5 flex flex-col min-w-0 w-full">
-
-        {/* Controls Row */}
+      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5 flex flex-col max-w-290">
+        {/* Controls Row (never scrolls in X) */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
             Repair Products
@@ -233,9 +232,9 @@ const RepairTableOne: React.FC = () => {
           </div>
         </div>
 
-        {/* FIXED SCROLLABLE TABLE */}
-        <div className="w-full overflow-x-auto rounded-lg">
-          <div className="min-w-max"> {/* Forces horizontal scroll only here */}
+        {/* ONLY TABLE SCROLLS HORIZONTALLY */}
+        <div className="max-w-full overflow-x-auto rounded-lg table-scrollbar">
+          <div className="min-w-max">
             <Table>
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
                 <TableRow>
@@ -255,7 +254,9 @@ const RepairTableOne: React.FC = () => {
                     <TableCell
                       key={label}
                       isHeader
-                      className={`px-5 py-3 dark:text-white text-gray-dark min-w-[${width}px] ${label === "Actions" ? "text-center" : ""}`}
+                      className={`px-5 py-3 dark:text-white text-gray-dark min-w-[${width}px] ${
+                        label === "Actions" ? "text-center" : ""
+                      }`}
                     >
                       {label}
                     </TableCell>
@@ -295,7 +296,9 @@ const RepairTableOne: React.FC = () => {
                         {prod.estimatedCost}
                       </TableCell>
                       <TableCell className="px-5 py-4 dark:text-white">
-                        {new Date(prod.completionDate).toLocaleDateString()}
+                        {prod.completionDate
+                          ? new Date(prod.completionDate).toLocaleDateString()
+                          : "-"}
                       </TableCell>
                       <TableCell className="px-5 py-4 dark:text-white">
                         {prod.comments}
@@ -337,7 +340,7 @@ const RepairTableOne: React.FC = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
+       <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </p>
@@ -360,7 +363,6 @@ const RepairTableOne: React.FC = () => {
         </div>
       </div>
 
-      {/* ---- ADD / EDIT / DELETE MODALS (UNCHANGED) ---- */}
       {/* Add Modal */}
       <ModalWrapper
         isOpen={modal.open && modal.type === "add"}
@@ -370,7 +372,10 @@ const RepairTableOne: React.FC = () => {
           Add Repair
         </h3>
 
-        <form onSubmit={handleAddProductSubmit} className="space-y-4 max-w-xl mx-auto">
+        <form
+          onSubmit={handleAddProductSubmit}
+          className="space-y-4 max-w-xl mx-auto"
+        >
           <label>
             <span className="block text-sm font-medium mb-1">Return ID</span>
             <input
@@ -402,7 +407,10 @@ const RepairTableOne: React.FC = () => {
           Edit Repair
         </h3>
 
-        <form onSubmit={handleEditProductSubmit} className="space-y-4 max-w-xl mx-auto">
+        <form
+          onSubmit={handleEditProductSubmit}
+          className="space-y-4 max-w-xl mx-auto"
+        >
           <label>
             <span className="block text-sm font-medium mb-1">Return ID</span>
             <input
