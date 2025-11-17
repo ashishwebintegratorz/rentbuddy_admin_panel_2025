@@ -21,6 +21,7 @@ import Payments from "./pages/Tables/Payments";
 import Invoice from   "./pages/Tables/Invoice";
 import Document from "./pages/Tables/Document";
 import Recurring from "./pages/Tables/Recurring";
+import Repair from "./pages/Tables/Repair";
 
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/Blank";
@@ -58,6 +59,7 @@ export default function App() {
             <Route path="/invoice" element={<Invoice />} />
             <Route path="/documents" element={<Document />} />
             <Route path="/recurring" element={<Recurring />} />
+            <Route path="/repair" element={<Repair />} />
 
             {/* Ui Elements */}
             <Route path="/alerts" element={<Alerts />} />
