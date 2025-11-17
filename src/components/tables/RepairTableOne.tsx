@@ -10,6 +10,7 @@ import { Pencil, Trash2, Plus } from "lucide-react";
 import Button from "../ui/button/Button";
 import { toast } from "react-toastify";
 import ModalWrapper from "../../layout/ModalWrapper";
+import { useSidebar } from "../../context/SidebarContext";
 
 interface RepairProduct {
   _id: string;
@@ -29,6 +30,12 @@ interface RepairProduct {
 const itemsPerPage = 10;
 
 const RepairTableOne: React.FC = () => {
+  // BEFORE
+  const { toggleSidebar } = useSidebar();
+
+  // AFTER
+  const { isExpanded } = useSidebar();
+
   const [repairProducts, setRepairProducts] = useState<RepairProduct[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -189,7 +196,11 @@ const RepairTableOne: React.FC = () => {
 
   return (
     <>
-      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5 flex flex-col max-w-290">
+      <div
+        className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col ${
+          isExpanded ? "max-w-290" : "max-w-340"
+        }`}
+      >
         {/* Controls Row (never scrolls in X) */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
@@ -340,7 +351,7 @@ const RepairTableOne: React.FC = () => {
         </div>
 
         {/* Pagination */}
-       <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </p>
