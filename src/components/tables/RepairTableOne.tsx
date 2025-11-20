@@ -198,7 +198,7 @@ const RepairTableOne: React.FC = () => {
     <>
       <div
         className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col ${
-          isExpanded ? "max-w-290" : "max-w-340"
+          isExpanded ? "max-w-40%" : "max-w-340"
         }`}
       >
         {/* Controls Row (never scrolls in X) */}

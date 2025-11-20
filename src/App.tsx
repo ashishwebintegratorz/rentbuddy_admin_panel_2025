@@ -22,7 +22,8 @@ import Invoice from   "./pages/Tables/Invoice";
 import Document from "./pages/Tables/Document";
 import Recurring from "./pages/Tables/Recurring";
 import Repair from "./pages/Tables/Repair";
-
+import Track from "./pages/Tables/Track";
+import Complaint from "./pages/Tables/Complaint";
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
@@ -60,6 +61,8 @@ export default function App() {
             <Route path="/documents" element={<Document />} />
             <Route path="/recurring" element={<Recurring />} />
             <Route path="/repair" element={<Repair />} />
+            <Route path="/track" element={<Track />} />
+            <Route path="/complaints" element={<Complaint />} />
 
             {/* Ui Elements */}
             <Route path="/alerts" element={<Alerts />} />
