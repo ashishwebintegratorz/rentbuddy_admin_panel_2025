@@ -10,6 +10,7 @@ import {
 import Button from "../ui/button/Button";
 import ModalWrapper from "../../layout/ModalWrapper";
 import { Pencil, Trash2 } from "lucide-react";
+import { useSidebar } from "../../context/SidebarContext";
 
 interface Complaint {
   _id: string;
@@ -43,6 +44,7 @@ const ComplaintTableOne = () => {
     complaint: Complaint | null;
   }>({ type: "", complaint: null });
   const [formStatus, setFormStatus] = useState<string>("");
+  const { isExpanded } = useSidebar();
 
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
@@ -136,8 +138,12 @@ const ComplaintTableOne = () => {
 
   return (
     <>
-    <div className="w-full overflow-x-auto">
-      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5 flex flex-col h-[82vh] min-h-0 w-full max-w-full table-scrollbar">
+   
+      <div
+        className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col table-scrollbar ${
+          isExpanded ? "max-w-40% xl:max-w-250" : "max-w-340 xl:max-w-300 2xl:max-w-70%"
+        }`}
+      >
         {/* Table scroll wrapper */}
         <div
           className="flex-grow overflow-x-auto overflow-y-auto rounded-lg"
@@ -336,27 +342,27 @@ const ComplaintTableOne = () => {
           </div>
         </div>
       </div>
-    </div>
+    
 
       {/* Edit Modal */}
       {openModal.type === "edit" && openModal.complaint && (
         <ModalWrapper isOpen={true} onClose={closeModal}>
-          <h2 className="text-xl font-bold mb-4">Edit Complaint Status</h2>
+          <h2 className="text-xl font-bold mb-4 dark:text-white text-gray-dark">Edit Complaint Status</h2>
           <form onSubmit={handleEditProductSubmit} className="space-y-4">
             <label>
-              <span className="block mb-1 font-medium">Status</span>
+              <span className="block mb-1 font-medium dark:text-white text-gray-dark">Status</span>
               <select
                 value={formStatus}
                 onChange={(e) => setFormStatus(e.target.value)}
                 required
-                className="w-full border rounded px-3 py-2"
+                className="w-full border rounded px-3 py-2 dark:text-white text-gray-dark bg-white dark:bg-neutral-900 "
               >
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
+                <option value="pending" className="hover:bg-neutral-50 dark:hover:bg-neutral-800">Pending</option>
+                <option value="completed" className="hover:bg-neutral-50 dark:hover:bg-neutral-800">Completed</option>
                 <option value="rejected">Rejected</option>
               </select>
             </label>
-            <div className="flex justify-end gap-4">
+            <div className="flex justify-end gap-4 pt-4">
               <Button variant="outline" onClick={closeModal}>
                 Cancel
               </Button>
