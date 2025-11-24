@@ -198,11 +198,11 @@ const RepairTableOne: React.FC = () => {
     <>
       <div
         className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col ${
-          isExpanded ? "max-w-40%" : "max-w-340"
+          isExpanded ? "max-w-40% xl:max-w-250" : "max-w-340 xl:max-w-280 2xl:max-w-70%"
         }`}
       >
         {/* Controls Row (never scrolls in X) */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 overflow-x-auto scrollbar-hide table-scrollbar">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
             Repair Products
           </h2>

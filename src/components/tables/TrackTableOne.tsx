@@ -99,7 +99,7 @@ const TrackTableOne: React.FC = () => {
 
   return (
     <Fragment>
-      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5 flex flex-col h-[82vh] min-h-0">
+      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5 flex flex-col h-[82vh] min-h-0 table-scrollbar">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
