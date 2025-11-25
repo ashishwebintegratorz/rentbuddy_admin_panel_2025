@@ -141,7 +141,7 @@ const ComplaintTableOne = () => {
    
       <div
         className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col table-scrollbar ${
-          isExpanded ? "max-w-40% xl:max-w-250" : "max-w-340 xl:max-w-300 2xl:max-w-70%"
+          isExpanded ? "max-w-40% xl:max-w-220 axl:max-w-270" : "max-w-340 xl:max-w-330 2xl:max-w-70%"
         }`}
       >
         {/* Table scroll wrapper */}

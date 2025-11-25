@@ -19,14 +19,22 @@ export default function AuthLayout({
             <div className="flex flex-col items-center max-w-xs">
               <Link to="/" className="block mb-4">
                 <img
+                  className="hidden dark:block"
                   width={231}
                   height={48}
-                  src="/images/logo/auth-logo.svg"
+                  src="/images/logo/rentbuddy.png"
+                  alt="Logo"
+                />
+                <img
+                  className="dark:hidden"
+                  width={231}
+                  height={48}
+                  src="/images/logo/rentbuddy1.png"
                   alt="Logo"
                 />
               </Link>
               <p className="text-center text-gray-400 dark:text-white/60">
-                Free and Open-Source Tailwind CSS Admin Dashboard Template
+                Welcome to RentBuddy Admin Panel
               </p>
             </div>
           </div>

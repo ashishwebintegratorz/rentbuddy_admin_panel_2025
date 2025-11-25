@@ -1,12 +1,15 @@
 import React from "react";
 import CustomerTableOne from "../../components/tables/CustomerTableOne";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 
 const Customers = () => {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-black dark:text-white">Customers</h1>
-      <CustomerTableOne />
-    </div>
+    <>
+      <PageBreadcrumb pageTitle="Customer" />
+      <div className="space-y-6">
+        <CustomerTableOne />
+      </div>
+    </>
   );
 };
 

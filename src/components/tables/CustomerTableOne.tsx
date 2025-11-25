@@ -7,22 +7,27 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { Pagination } from "../ui/pagination/Pagination";
+import Avatar from "../ui/avatar/Avatar";
+import ModalWrapper from "../../layout/ModalWrapper";
+
+type CustomerRow = {
+  name: string;
+  img?: string | null; // optional image
+  customerId: string;
+  createdDate: string;
+  email: string;
+  phonenumber: string;
+  subscription: string;
+  action: number;
+};
 
 export default function CustomerTableOne() {
-  const [customers, setCustomers] = useState<
-    {
-      name: string;
-      img: string;
-      customerId: string;
-      createdDate: string;
-      email: string;
-      phonenumber: string;
-      subscription: string;
-      action: number;
-    }[]
-  >([]);
+  const [customers, setCustomers] = useState<CustomerRow[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const customersPerPage = 10;
 
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
@@ -31,10 +36,10 @@ export default function CustomerTableOne() {
     axios
       .get(`${BASE_API_URL}/user/getAllCustomers`)
       .then((res) => {
-        const fetched = res.data.data.map((cust: any) => ({
+        const fetched: CustomerRow[] = res.data.data.map((cust: any) => ({
           name: cust.username,
-          img: "/images/user/user-17.jpg",
-          customerId: cust.customerId,
+          img: cust.avatarUrl ?? cust.profileImage ?? null,
+          customerId: cust.customerId, // make sure this is the Auth _id if delete uses that
           createdDate: new Date(cust.createdAt).toLocaleDateString("en-IN", {
             day: "2-digit",
             month: "short",
@@ -52,7 +57,15 @@ export default function CustomerTableOne() {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`${BASE_API_URL}/user/deleteCustomer/${id}`);
+      const token = localStorage.getItem("token"); // if you use auth
+
+      await axios.delete(`${BASE_API_URL}/user/deleteCustomer`, {
+        data: { id }, // 👈 body goes here for axios.delete
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+
       setCustomers((prev) => prev.filter((cust) => cust.customerId !== id));
     } catch (err) {
       console.error("Delete failed:", err);
@@ -71,10 +84,25 @@ export default function CustomerTableOne() {
   const current = filtered.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(filtered.length / customersPerPage);
 
+  const openConfirm = (id: string) => {
+    setConfirmId(id);
+  };
+
+  const closeConfirm = () => {
+    if (isDeleting) return;
+    setConfirmId(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmId) return;
+    await handleDelete(confirmId);
+    closeConfirm();
+  };
+
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-5 dark:border-white/[0.05] dark:bg-white/[0.03]">
       {/* Header with Search */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
           Customers
         </h2>
@@ -86,36 +114,54 @@ export default function CustomerTableOne() {
             setSearch(e.target.value);
             setCurrentPage(1);
           }}
-          className="w-full sm:w-64 rounded-lg border border-gray-300 dark:border-white/[0.1] bg-white/80 dark:bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+          className="w-full rounded-lg border border-gray-300 bg-white/80 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-white/[0.1] dark:bg-transparent dark:text-white sm:w-64"
         />
       </div>
 
       {/* Table */}
       <div className="max-w-full overflow-x-auto rounded-lg">
         <Table>
-          <TableHeader className="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
+          <TableHeader className="border-b border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-white/[0.03]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-semibold text-gray-700 dark:text-gray-400"
+              >
                 Customer
               </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-semibold text-gray-700 dark:text-gray-400"
+              >
                 Customer ID
               </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-semibold text-gray-700 dark:text-gray-400"
+              >
                 Created Date
               </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-semibold text-gray-700 dark:text-gray-400"
+              >
                 Email
               </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold dark:text-gray-400">
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-semibold text-gray-700 dark:text-gray-400"
+              >
                 Phone
               </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-700 font-semibold  dark:text-gray-400">
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-semibold text-gray-700 dark:text-gray-400"
+              >
                 Subscription
               </TableCell>
               <TableCell
                 isHeader
-                className="px-5 py-3 text-gray-700 font-semibold text-center  dark:text-gray-400"
+                className="px-5 py-3 text-center font-semibold text-gray-700 dark:text-gray-400"
               >
                 Action
               </TableCell>
@@ -128,31 +174,32 @@ export default function CustomerTableOne() {
                 <TableRow key={cust.customerId}>
                   <TableCell className="px-5 py-4 text-start">
                     <div className="flex items-center gap-3">
-                      <img
-                        src={cust.img}
+                      <Avatar
+                        src={cust.img || undefined}
                         alt={cust.name}
-                        className="w-10 h-10 rounded-full object-cover"
+                        nameForInitials={cust.name}
+                        size={40}
                       />
                       <span className="font-medium text-gray-700 dark:text-white/90">
                         {cust.name}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
                     {cust.customerId}
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
                     {cust.createdDate}
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
                     {cust.email}
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
                     {cust.phonenumber}
                   </TableCell>
-                  <TableCell className="px-4 py-3 dark:text-gray-400 text-gray-700">
+                  <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-400">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
                         cust.subscription === "Active"
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
@@ -163,8 +210,8 @@ export default function CustomerTableOne() {
                   </TableCell>
                   <TableCell className="px-4 py-3 text-center">
                     <button
-                      onClick={() => handleDelete(cust.customerId)}
-                      className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
+                      onClick={() => openConfirm(cust.customerId)}
+                      className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-600"
                     >
                       Delete
                     </button>
@@ -175,7 +222,7 @@ export default function CustomerTableOne() {
               <TableRow>
                 <td
                   colSpan={7}
-                  className="text-center py-6 text-gray-500 italic"
+                  className="py-6 text-center text-gray-500 italic"
                 >
                   No customers found.
                 </td>
@@ -186,39 +233,47 @@ export default function CustomerTableOne() {
       </div>
 
       {/* Pagination */}
-      {filtered.length > 0 && (
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
-          <p className="text-sm text-gray-600">
+      {Array.isArray(filtered) && filtered.length > 0 && (
+        <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              disabled={currentPage === 1}
-              className={`px-3 py-1 text-sm rounded-md border transition ${
-                currentPage === 1
-                  ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                  : "text-gray-700 border-gray-300 hover:bg-gray-100"
-              }`}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() =>
-                setCurrentPage((p) => Math.min(p + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className={`px-3 py-1 text-sm rounded-md border transition ${
-                currentPage === totalPages
-                  ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                  : "text-gray-700 border-gray-300 hover:bg-gray-100"
-              }`}
-            >
-              Next
-            </button>
-          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            windowSize={3}
+          />
         </div>
       )}
+
+      {/* Delete confirm modal */}
+      <ModalWrapper isOpen={!!confirmId} onClose={closeConfirm}>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+          Delete customer?
+        </h3>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+          This action cannot be undone. Are you sure you want to delete this
+          customer?
+        </p>
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            onClick={closeConfirm}
+            disabled={isDeleting}
+            className="rounded-lg border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+          >
+            No, keep
+          </button>
+          <button
+            onClick={handleConfirmDelete}
+            disabled={isDeleting}
+            className="rounded-lg bg-red-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isDeleting ? "Deleting..." : "Yes, delete"}
+          </button>
+        </div>
+      </ModalWrapper>
     </div>
   );
 }

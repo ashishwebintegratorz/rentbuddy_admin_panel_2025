@@ -7,19 +7,41 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Printer, Check, RotateCcw, AlertCircle } from "lucide-react";
+import {
+  Printer,
+  Check,
+  RotateCcw,
+  AlertCircle,
+  ChevronDown,
+} from "lucide-react";
+
+// ⬇️ adjust paths as per your folder structure
+import { Dropdown } from "../ui/dropdown/Dropdown";
+import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { Pagination } from "../ui/pagination/Pagination";
 
 export default function BarcodeTableOne() {
-  const [barcodes, setBarcodes] = useState([]);
+  const [barcodes, setBarcodes] = useState<any[]>([]);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // "all" | "rented" | "available" | "returned" | "damaged" ...
+  const [statusFilter, setStatusFilter] = useState<
+    | "all"
+    | "rented"
+    | "available"
+    | "returned"
+    | "damaged"
+    | "active"
+    | "inactive"
+  >("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Dropdown open state
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+
   // Added states
-  const [viewBarcode, setViewBarcode] = useState(null);
+  const [viewBarcode, setViewBarcode] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [selectedBarcodes, setSelectedBarcodes] = useState([]);
+  const [selectedBarcodes, setSelectedBarcodes] = useState<string[]>([]);
 
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
@@ -27,7 +49,6 @@ export default function BarcodeTableOne() {
   const fetchBarcodes = async () => {
     try {
       const res = await axios.get(`${BASE_API_URL}/barcode/getAllBarcodes`);
-      // API returns { data: [...] } earlier, preserve that:
       const data = res?.data?.data ?? res?.data ?? [];
       setBarcodes(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -41,19 +62,24 @@ export default function BarcodeTableOne() {
   }, [BASE_API_URL]);
 
   // Safe filtered list applying search & status filter
-  const filtered = (Array.isArray(barcodes) ? barcodes : []).filter((b) => {
-    const matchesSearch =
-      !search ||
-      b?.brID?.toLowerCase().includes(search.toLowerCase()) ||
-      b?.rentalItem?.productName
-        ?.toString()
-        .toLowerCase()
-        .includes(search.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" ||
-      (b?.status && b.status.toString().toLowerCase() === statusFilter);
-    return matchesSearch && matchesStatus;
-  });
+  const filtered = (Array.isArray(barcodes) ? barcodes : []).filter(
+    (b: any) => {
+      const matchesSearch =
+        !search ||
+        b?.brID?.toLowerCase().includes(search.toLowerCase()) ||
+        b?.rentalItem?.productName
+          ?.toString()
+          .toLowerCase()
+          .includes(search.toLowerCase());
+
+      const statusValue = b?.status?.toString().toLowerCase();
+
+      const matchesStatus =
+        statusFilter === "all" || (statusValue && statusValue === statusFilter);
+
+      return matchesSearch && matchesStatus;
+    }
+  );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const indexOfLast = currentPage * itemsPerPage;
@@ -62,9 +88,12 @@ export default function BarcodeTableOne() {
     ? filtered.slice(indexOfFirst, indexOfLast)
     : [];
 
-  // Status badge component (kept same as your original styles)
-  const StatusBadge = ({ status }) => {
-    const statusConfig = {
+  // Status badge component
+  const StatusBadge = ({ status }: { status: string }) => {
+    const statusConfig: Record<
+      string,
+      { bg: string; text: string; icon: React.ReactNode }
+    > = {
       rented: {
         bg: "bg-amber-100",
         text: "text-amber-800",
@@ -113,32 +142,33 @@ export default function BarcodeTableOne() {
     );
   };
 
-  // --- Selection logic ---
-  const toggleSelect = (id) => {
+  // Selection logic
+  const toggleSelect = (id: string) => {
     setSelectedBarcodes((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
   const toggleSelectAllOnPage = () => {
-    const pageIds = Array.isArray(current) ? current.map((b) => b._id) : [];
+    const pageIds = Array.isArray(current)
+      ? current.map((b: any) => b._id)
+      : [];
     if (pageIds.length === 0) return;
 
     const allSelected = pageIds.every((id) => selectedBarcodes.includes(id));
     if (allSelected) {
-      // remove page ids from selection
       setSelectedBarcodes((prev) => prev.filter((id) => !pageIds.includes(id)));
     } else {
-      // add page ids to selection (unique)
       setSelectedBarcodes((prev) => Array.from(new Set([...prev, ...pageIds])));
     }
   };
 
-  // Print single barcode (keeps your original behavior)
-  const handlePrint = (barcodeImg) => {
+  // Print single barcode
+  const handlePrint = (barcodeImg: string | null) => {
     if (!barcodeImg) return alert("No barcode image found!");
     const newWin = window.open();
     if (!newWin) return alert("Popup blocked — allow popups for this site.");
+
     newWin.document.write(
       `<html><head><title>Print</title></head><body style="display:flex;flex-direction:column;align-items:center;">` +
         `<img src="data:image/png;base64,${barcodeImg}" style="width:300px;">` +
@@ -157,8 +187,8 @@ export default function BarcodeTableOne() {
     }
 
     const itemsToPrint = (Array.isArray(barcodes) ? barcodes : [])
-      .filter((b) => selectedBarcodes.includes(b._id))
-      .map((b) => b.barcodeImg)
+      .filter((b: any) => selectedBarcodes.includes(b._id))
+      .map((b: any) => b.barcodeImg)
       .filter(Boolean);
 
     if (itemsToPrint.length === 0) {
@@ -169,19 +199,15 @@ export default function BarcodeTableOne() {
   };
 
   // Return API call - only visible for rented items
-  const handleReturn = async (barcodeId) => {
+  const handleReturn = async (barcodeId: string) => {
     if (!confirm("Mark this barcode as returned?")) return;
     try {
-      const res = await axios.put(
-        `${BASE_API_URL}/barcode/return/${barcodeId}`,
-        {
-          conditionAtReturn: "good",
-        }
-      );
-      // Refresh list and clear selection for that barcode
+      await axios.put(`${BASE_API_URL}/barcode/return/${barcodeId}`, {
+        conditionAtReturn: "good",
+      });
+
       await fetchBarcodes();
       setSelectedBarcodes((prev) => prev.filter((id) => id !== barcodeId));
-      // Optionally show a toast here (not included)
     } catch (err) {
       console.error("Error returning barcode:", err);
       alert("Failed to return barcode. See console for details.");
@@ -192,18 +218,18 @@ export default function BarcodeTableOne() {
   useEffect(() => {
     setCurrentPage(1);
   }, [search, statusFilter]);
-  // MULTI-PAGE BARCODE SHEET PRINTING (24 per A4 page)
 
   // ONE BARCODE PER ROW PRINTING (auto multi-page)
-  const handleMultiPrint = (barcodeList) => {
+  const handleMultiPrint = (barcodeList: string[]) => {
     if (!barcodeList || barcodeList.length === 0) {
       alert("No barcodes selected for printing");
       return;
     }
 
     const printWindow = window.open("", "", "width=900,height=700");
+    if (!printWindow) return;
 
-    const maxPerPage = 10; // 10 rows per page (you can increase to 12–15)
+    const maxPerPage = 10;
 
     let html = `
     <html>
@@ -229,7 +255,7 @@ export default function BarcodeTableOne() {
         }
 
         img {
-          width: 300px; /* increase/decrease size */
+          width: 300px;
           height: auto;
         }
       </style>
@@ -265,6 +291,16 @@ export default function BarcodeTableOne() {
     };
   };
 
+  const statusLabelMap: Record<string, string> = {
+    all: "All Status",
+    available: "Available",
+    rented: "Rented",
+    returned: "Returned",
+    damaged: "Damaged",
+    active: "Active",
+    inactive: "Inactive",
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5">
       {/* Header with Search + Status Filter + Print Selected */}
@@ -284,27 +320,67 @@ export default function BarcodeTableOne() {
             className="w-full sm:w-64 rounded-lg border border-gray-300 dark:border-white/[0.1] bg-white/80 dark:bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
           />
 
-          {/* Status filter (A: beside the search bar) */}
-          <div className="flex items-center gap-3 mb-1">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="
-      bg-white dark:bg-neutral-900 
-      border border-gray-300 dark:border-neutral-700 
-      text-gray-700 dark:text-gray-200 
-      px-3 py-1.5 rounded-lg 
-      focus:outline-none focus:ring-2 
-      focus:ring-indigo-500 
-      transition-all duration-150
-      shadow-sm
-    "
+          {/* Status filter using Dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              className="dropdown-toggle flex items-center gap-2 bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-150 shadow-sm text-sm"
+              onClick={() => setIsStatusDropdownOpen((prev) => !prev)}
             >
-              <option value="">All Status</option>
-              <option value="available">Available</option>
-              <option value="rented">Rented</option>
-              <option value="damaged">Damaged</option>
-            </select>
+              <span>{statusLabelMap[statusFilter] ?? "All Status"}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${
+                  isStatusDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            <Dropdown
+              isOpen={isStatusDropdownOpen}
+              onClose={() => setIsStatusDropdownOpen(false)}
+              className="w-44"
+            >
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("all");
+                  setIsStatusDropdownOpen(false);
+                }}
+              >
+                All Status
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("available");
+                  setIsStatusDropdownOpen(false);
+                }}
+              >
+                Available
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("rented");
+                  setIsStatusDropdownOpen(false);
+                }}
+              >
+                Rented
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("damaged");
+                  setIsStatusDropdownOpen(false);
+                }}
+              >
+                Damaged
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("returned");
+                  setIsStatusDropdownOpen(false);
+                }}
+              >
+                Returned
+              </DropdownItem>
+            </Dropdown>
           </div>
 
           <button
@@ -329,14 +405,13 @@ export default function BarcodeTableOne() {
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
             <TableRow>
-              {/* Select all checkbox */}
               <TableCell isHeader className="px-5 py-3">
                 <input
                   type="checkbox"
                   checked={
                     Array.isArray(current) &&
                     current.length > 0 &&
-                    current.every((b) => selectedBarcodes.includes(b._id))
+                    current.every((b: any) => selectedBarcodes.includes(b._id))
                   }
                   onChange={toggleSelectAllOnPage}
                 />
@@ -389,9 +464,8 @@ export default function BarcodeTableOne() {
 
           <TableBody>
             {Array.isArray(current) && current.length > 0 ? (
-              current.map((b, index) => (
+              current.map((b: any, index: number) => (
                 <TableRow key={b._id}>
-                  {/* row checkbox */}
                   <TableCell className="px-5 py-4">
                     <input
                       type="checkbox"
@@ -438,9 +512,7 @@ export default function BarcodeTableOne() {
                     )}
                   </TableCell>
 
-                  {/* Action column */}
                   <TableCell className="px-5 py-4 text-center flex items-center justify-center gap-2">
-                    {/* View Button */}
                     <button
                       onClick={() => {
                         setViewBarcode(b.barcodeImg);
@@ -451,7 +523,6 @@ export default function BarcodeTableOne() {
                       View
                     </button>
 
-                    {/* Print Button */}
                     <button
                       onClick={() => handlePrint(b.barcodeImg)}
                       className="px-3 py-1.5 text-xs font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-800 transition flex items-center gap-1"
@@ -459,7 +530,6 @@ export default function BarcodeTableOne() {
                       <Printer className="h-3 w-3" /> Print
                     </button>
 
-                    {/* Return Button: only when rented */}
                     {b?.status?.toString().toLowerCase() === "rented" ? (
                       <button
                         onClick={() => handleReturn(b._id)}
@@ -486,28 +556,19 @@ export default function BarcodeTableOne() {
       </div>
 
       {/* Pagination */}
+      {/* Pagination */}
       {Array.isArray(filtered) && filtered.length > 0 && (
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
-          <p className="text-sm text-gray-600">
+        <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 rounded border dark:text-white text-gray-dark disabled:opacity-50"
-            >
-              Previous
-            </button>
 
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded border dark:text-white text-gray-dark disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            windowSize={3}
+          />
         </div>
       )}
 

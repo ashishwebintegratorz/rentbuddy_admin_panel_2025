@@ -1,11 +1,19 @@
 export default function GridShape() {
   return (
     <>
-      <div className="absolute right-0 top-0 -z-1 w-full max-w-[250px] xl:max-w-[450px]">
-        <img src="/images/shape/grid-01.svg" alt="grid" />
+      <div className="">
+        <img
+          src="/images/shape/grid-01.svg"
+          alt="grid"
+          className="absolute inset-1 -top-65 w-full h-full object-cover"
+        />
       </div>
-      <div className="absolute bottom-0 left-0 -z-1 w-full max-w-[250px] rotate-180 xl:max-w-[450px]">
-        <img src="/images/shape/grid-01.svg" alt="grid" />
+      <div className="">
+        <img
+          src="/images/shape/grid-01.svg"
+          alt="grid"
+          className="absolute inset-1 top-60 w-full h-full object-cover opacity-85 dark:opacity-25"
+        />
       </div>
     </>
   );

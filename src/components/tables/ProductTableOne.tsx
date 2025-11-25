@@ -7,10 +7,20 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { MoreVertical, Pencil, Tag, Trash2,Plus } from "lucide-react";
+import {
+  MoreVertical,
+  Pencil,
+  Tag,
+  Trash2,
+  Plus,
+  ChevronDown,
+} from "lucide-react";
 import Button from "../ui/button/Button";
 import { toast } from "react-toastify";
 import ModalWrapper from "../../layout/ModalWrapper";
+import { Pagination } from "../ui/pagination/Pagination";
+import { Dropdown } from "../ui/dropdown/Dropdown";
+import { DropdownItem } from "../ui/dropdown/DropdownItem";
 
 function EditProductForm({
   product,
@@ -21,13 +31,22 @@ function EditProductForm({
   isAdd = false,
 }: {
   product: any;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  onChange: (
+    e:
+      | React.ChangeEvent<
+          HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+        >
+      | { target: { name: string; value: string } }
+  ) => void;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
   isAdd?: boolean;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
+  const categoryLabel = product.category || "Select category";
 
   // Update image preview when file changes
   useEffect(() => {
@@ -47,64 +66,118 @@ function EditProductForm({
     }
   }, [product.image]);
 
+  // helper to change category via DropdownItem
+  const handleCategorySelect = (value: string) => {
+    onChange({ target: { name: "category", value } } as any);
+    setIsCategoryOpen(false);
+  };
+
   return (
     <form onSubmit={onSubmit} className="mt-3 space-y-4">
       {/* Product Name and Category (flex layout) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-white">Product Name</label>
+          <label className="block text-sm font-medium mb-1 dark:text-white">
+            Product Name
+          </label>
           <input
             type="text"
             name="productName"
             value={product.productName || ""}
             onChange={onChange}
             placeholder="Enter product name"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-900 dark:text-white"
             required
           />
         </div>
+
+        {/* Category as Dropdown */}
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-white">Category</label>
-          <select
-            name="category"
-            value={product.category || ""}
-            onChange={onChange}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
-            required
-          >
-            <option value="">Select category</option>
-            <option value="Bedroom">Bedroom</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Dining Room">Dining Room</option>
-            <option value="Storage">Storage</option>
-            <option value="Appliances">Appliances</option>
-            <option value="Work From Home">Work From Home</option>
-          </select>
+          <label className="block text-sm font-medium mb-1 dark:text-white">
+            Category
+          </label>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsCategoryOpen((prev) => !prev)}
+              className="dropdown-toggle flex w-full items-center justify-between gap-2 rounded-lg border
+                         bg-white px-4 py-2 text-sm text-gray-700 shadow-sm transition
+                         hover:bg-gray-50 
+                         dark:bg-gray-900 dark:text-white"
+            >
+              <span>{categoryLabel}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${
+                  isCategoryOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            <Dropdown
+              isOpen={isCategoryOpen}
+              onClose={() => setIsCategoryOpen(false)}
+              className="w-full"
+            >
+              <DropdownItem onItemClick={() => handleCategorySelect("")}>
+                Select category
+              </DropdownItem>
+              <DropdownItem onItemClick={() => handleCategorySelect("Bedroom")}>
+                Bedroom
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => handleCategorySelect("Living Room")}
+              >
+                Living Room
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => handleCategorySelect("Dining Room")}
+              >
+                Dining Room
+              </DropdownItem>
+              <DropdownItem onItemClick={() => handleCategorySelect("Storage")}>
+                Storage
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => handleCategorySelect("Appliances")}
+              >
+                Appliances
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => handleCategorySelect("Work From Home")}
+              >
+                Work From Home
+              </DropdownItem>
+            </Dropdown>
+          </div>
         </div>
       </div>
 
       {/* Rental Price & Cost Price */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-white">Rental Price</label>
+          <label className="block text-sm font-medium mb-1 dark:text-white">
+            Rental Price
+          </label>
           <input
             type="text"
             name="rentalPrice"
             value={product.rentalPrice || ""}
             onChange={onChange}
             placeholder="per month"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-900 dark:text-white"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-white">Cost Price</label>
+          <label className="block text-sm font-medium mb-1 dark:text-white">
+            Cost Price
+          </label>
           <input
             type="text"
             name="costPrice"
             value={product.costPrice || ""}
             onChange={onChange}
             placeholder="Amount"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-900 dark:text-white"
           />
         </div>
       </div>
@@ -112,18 +185,22 @@ function EditProductForm({
       {/* Deposit & Stock */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-white">Deposit</label>
+          <label className="block text-sm font-medium mb-1 dark:text-white">
+            Deposit
+          </label>
           <input
             type="text"
             name="deposit"
             value={product.deposit || ""}
             onChange={onChange}
             placeholder="Amount"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-900 dark:text-white"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-white">Stock</label>
+          <label className="block text-sm font-medium mb-1 dark:text-white">
+            Stock
+          </label>
           <input
             type="number"
             name="stocks"
@@ -131,39 +208,45 @@ function EditProductForm({
             onChange={onChange}
             placeholder="Quantity"
             min="0"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
+            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-900 dark:text-white"
           />
         </div>
       </div>
 
       {/* City */}
       <div>
-        <label className="block text-sm font-medium mb-1 dark:text-white">City</label>
+        <label className="block text-sm font-medium mb-1 dark:text-white">
+          City
+        </label>
         <input
           type="text"
           name="city"
           value={product.city || ""}
           onChange={onChange}
           placeholder="Enter city"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
+          className="w-full px-4 py-2 border rounded-lg dark:bg-gray-900 dark:text-white"
         />
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium mb-1 dark:text-white">Description</label>
+        <label className="block text-sm font-medium mb-1 dark:text-white">
+          Description
+        </label>
         <textarea
           name="description"
           value={product.description || ""}
           onChange={onChange}
           placeholder="Enter product description"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-base h-24 resize-none dark:bg-gray-900 dark:text-white"
+          className="w-full px-4 py-2 border rounded-lgtext-base h-24 resize-none dark:bg-gray-900 dark:text-white"
         />
       </div>
 
       {/* File Upload with preview */}
       <div>
-        <label className="block mb-1 font-medium dark:text-white">Upload Product Image</label>
+        <label className="block mb-1 font-medium dark:text-white">
+          Upload Product Image
+        </label>
         <div className="flex items-center gap-4">
           <label className="cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium py-2.5 px-5 rounded-lg transition duration-300 hover:from-blue-600 hover:to-indigo-700 active:scale-95">
             <input
@@ -186,8 +269,12 @@ function EditProductForm({
 
       {/* Buttons */}
       <div className="grid grid-cols-2 gap-4 pt-2">
-        <Button variant="primary">{isAdd ? "Add Product" : "Save Changes"}</Button>
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button variant="primary">
+          {isAdd ? "Add Product" : "Save Changes"}
+        </Button>
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
       </div>
     </form>
   );
@@ -281,9 +368,7 @@ function EditOfferForm({
         />
       </div>
       <div className="grid grid-cols-2 gap-4 pt-2">
-        <Button variant="primary">
-          Save Offer
-        </Button>
+        <Button variant="primary">Save Offer</Button>
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
@@ -352,9 +437,7 @@ function EditDurationDiscountForm({
         />
       </div>
       <div className="flex gap-3 pt-2">
-        <Button variant="primary">
-          Save Discount
-        </Button>
+        <Button variant="primary">Save Discount</Button>
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
@@ -389,7 +472,17 @@ export default function ProductTableOne() {
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [menuOpen, setMenuOpen] = useState(null);
-  const [modal, setModal] = useState<{ open: boolean; type: string; product: Product | null }>({ open: false, type: "", product: null });
+  const [catOpen, setCatOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+
+  const categoryLabel = categoryFilter || "All Categories";
+  const statusLabel = statusFilter || "All Statuses";
+
+  const [modal, setModal] = useState<{
+    open: boolean;
+    type: string;
+    product: Product | null;
+  }>({ open: false, type: "", product: null });
   const [editProduct, setEditProduct] = useState<{
     _id?: string;
     productName?: string;
@@ -411,8 +504,6 @@ export default function ProductTableOne() {
 
   const itemsPerPage = 10;
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
-;
-
   const [newProduct, setNewProduct] = useState({
     productName: "",
     category: "",
@@ -430,8 +521,13 @@ export default function ProductTableOne() {
     setNewProduct((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleNewProductFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewProduct((prev) => ({ ...prev, image: e.target.files ? e.target.files[0] : null }));
+  const handleNewProductFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setNewProduct((prev) => ({
+      ...prev,
+      image: e.target.files ? e.target.files[0] : null,
+    }));
   };
 
   const fetchProducts = async () => {
@@ -459,7 +555,8 @@ export default function ProductTableOne() {
         p?.productName?.toLowerCase().includes(search.toLowerCase()) ||
         p?.sku?.toString().toLowerCase().includes(search.toLowerCase()) ||
         p?.serialNumber?.toLowerCase().includes(search.toLowerCase())) &&
-      (!categoryFilter || p?.category?.toLowerCase().includes(categoryFilter.toLowerCase())) &&
+      (!categoryFilter ||
+        p?.category?.toLowerCase().includes(categoryFilter.toLowerCase())) &&
       (!statusFilter ||
         p?.availability?.toLowerCase() === statusFilter.toLowerCase())
     );
@@ -474,7 +571,9 @@ export default function ProductTableOne() {
     availability?: string | null;
   }
 
-  const AvailabilityBadge: React.FC<AvailabilityBadgeProps> = ({ availability }) => {
+  const AvailabilityBadge: React.FC<AvailabilityBadgeProps> = ({
+    availability,
+  }) => {
     const map: Record<string, string> = {
       available: "bg-green-100 text-green-700",
       rented: "bg-amber-100 text-amber-700",
@@ -521,7 +620,9 @@ export default function ProductTableOne() {
   };
 
   const handleEditProductChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setEditProduct((prev: any) => ({ ...prev, [name]: value }));
@@ -542,7 +643,9 @@ export default function ProductTableOne() {
     setEditDiscount((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEditProductSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditProductSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
@@ -613,7 +716,9 @@ export default function ProductTableOne() {
     }
   };
 
-  const handleEditDiscountSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditDiscountSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
@@ -639,24 +744,28 @@ export default function ProductTableOne() {
       toast.error("Failed to update discount");
     }
   };
-  const handleAddProductSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddProductSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
       const formData = new FormData();
       // iterate keys with a typed array so TypeScript knows the key is a keyof newProduct
-      (Object.keys(newProduct) as (keyof typeof newProduct)[]).forEach((key) => {
-        const value = newProduct[key];
-        if (value !== null && value !== undefined) {
-          // Note: your backend expects "stock" not "stocks"
-          const formKey = key === "stocks" ? "stock" : key;
-          if (value instanceof File) {
-            formData.append(formKey, value);
-          } else {
-            formData.append(formKey, String(value));
+      (Object.keys(newProduct) as (keyof typeof newProduct)[]).forEach(
+        (key) => {
+          const value = newProduct[key];
+          if (value !== null && value !== undefined) {
+            // Note: your backend expects "stock" not "stocks"
+            const formKey = key === "stocks" ? "stock" : key;
+            if (value instanceof File) {
+              formData.append(formKey, value);
+            } else {
+              formData.append(formKey, String(value));
+            }
           }
         }
-      });
+      );
       await axios.post(`${BASE_API_URL}/products/addProduct`, formData, {
         headers: {
           Authorization: token,
@@ -689,16 +798,8 @@ export default function ProductTableOne() {
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
           Product Table
         </h2>
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <Button
-            className="flex items-center gap-2 px-3 py-2 text-white "
-            onClick={() =>
-              setModal({ open: true, type: "add-product", product: null })
-            }
-          >
-            <Plus className="w-5 h-5" /> Add Product
-          </Button>
-
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* Search */}
           <input
             type="text"
             placeholder="Search by Product, SKU, Serial No..."
@@ -707,38 +808,158 @@ export default function ProductTableOne() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full sm:w-64 rounded-lg border border-gray-300 dark:border-white/[0.1] bg-white/80 dark:bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-700 dark:text-white"
+            className="w-full sm:w-64 rounded-lg border border-gray-300 dark:border-white/[0.1]
+               bg-white dark:bg-transparent px-3 py-2 text-sm focus:outline-none
+               focus:ring-2 focus:ring-gray-700 dark:text-white"
           />
-          <select
-            value={categoryFilter}
-            onChange={(e) => {
-              setCategoryFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full sm:w-48 rounded-lg border border-gray-300 dark:border-white/[0.1] bg-white dark:bg-neutral-950 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-700 dark:text-white hover:bg-gray-700"
+
+          {/* CATEGORY FILTER DROPDOWN */}
+          <div className="relative">
+            <button
+              type="button"
+              className="flex items-center gap-2 bg-white dark:bg-neutral-900 border border-gray-300
+                 dark:border-neutral-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-lg
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm text-sm"
+              onClick={() => setCatOpen((prev) => !prev)}
+            >
+              <span>{categoryLabel}</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            <Dropdown
+              isOpen={catOpen}
+              onClose={() => setCatOpen(false)}
+              className="w-48"
+            >
+              <DropdownItem
+                onItemClick={() => {
+                  setCategoryFilter("");
+                  setCatOpen(false);
+                }}
+              >
+                All Categories
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setCategoryFilter("Bedroom");
+                  setCatOpen(false);
+                }}
+              >
+                Bedroom
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setCategoryFilter("Living Room");
+                  setCatOpen(false);
+                }}
+              >
+                Living Room
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setCategoryFilter("Dining Room");
+                  setCatOpen(false);
+                }}
+              >
+                Dining Room
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setCategoryFilter("Storage");
+                  setCatOpen(false);
+                }}
+              >
+                Storage
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setCategoryFilter("Appliances");
+                  setCatOpen(false);
+                }}
+              >
+                Appliances
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setCategoryFilter("Work From Home");
+                  setCatOpen(false);
+                }}
+              >
+                Work From Home
+              </DropdownItem>
+            </Dropdown>
+          </div>
+
+          {/* STATUS FILTER DROPDOWN */}
+          <div className="relative">
+            <button
+              type="button"
+              className="flex items-center gap-2 bg-white dark:bg-neutral-900 border border-gray-300
+                 dark:border-neutral-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-lg
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm text-sm"
+              onClick={() => setStatusOpen((prev) => !prev)}
+            >
+              <span>{statusLabel}</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            <Dropdown
+              isOpen={statusOpen}
+              onClose={() => setStatusOpen(false)}
+              className="w-48"
+            >
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("");
+                  setStatusOpen(false);
+                }}
+              >
+                All Statuses
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("available");
+                  setStatusOpen(false);
+                }}
+              >
+                Available
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("rented");
+                  setStatusOpen(false);
+                }}
+              >
+                Rented
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("maintenance");
+                  setStatusOpen(false);
+                }}
+              >
+                Maintenance
+              </DropdownItem>
+              <DropdownItem
+                onItemClick={() => {
+                  setStatusFilter("unavailable");
+                  setStatusOpen(false);
+                }}
+              >
+                Unavailable
+              </DropdownItem>
+            </Dropdown>
+          </div>
+
+          {/* ADD PRODUCT BUTTON */}
+          <Button
+            className="flex items-center gap-2 px-3 py-2 text-white"
+            onClick={() =>
+              setModal({ open: true, type: "add-product", product: null })
+            }
           >
-            <option value="">All Categories</option>
-            <option value="Bedroom">Bedroom</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Dining Room">Dining Room</option>
-            <option value="Storage">Storage</option>
-            <option value="Appliances">Appliances</option>
-            <option value="Work From Home">Work From Home</option>
-          </select>
-          <select
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full sm:w-48 rounded-lg border border-gray-300 dark:border-white/[0.1] bg-white dark:bg-neutral-950 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-700 dark:text-white "
-          >
-            <option value="">All Statuses</option>
-            <option value="available">Available</option>
-            <option value="rented">Rented</option>
-            <option value="maintenance">Maintenance</option>
-            <option value="unavailable">Unavailable</option>
-          </select>
+            <Plus className="w-5 h-5" /> Add Product
+          </Button>
         </div>
       </div>
 
@@ -843,10 +1064,10 @@ export default function ProductTableOne() {
                     {menuOpen === p._id && (
                       <div
                         ref={menuRef}
-                        className="absolute right-9 top-10 z-10 min-w-[180px] bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-100 dark:border-gray-700 text-left"
+                        className="absolute right-9 top-14 z-10 min-w-[180px] bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700 text-left"
                       >
                         <button
-                          className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
+                          className="flex rounded-t-lg items-center gap-2 w-full px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
                           onClick={() => openModal("edit-product", p)}
                         >
                           <Pencil className="w-4 h-4" /> Edit Product
@@ -858,7 +1079,7 @@ export default function ProductTableOne() {
                           <Tag className="w-4 h-4" /> Edit Offer
                         </button>
                         <button
-                          className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-red-100 dark:hover:bg-gray-700 text-red-600"
+                          className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-red-100 dark:hover:bg-gray-700 text-red-600 rounded-b-lg"
                           onClick={() => openModal("delete", p)}
                         >
                           <Trash2 className="w-4 h-4" /> Delete Product
@@ -883,27 +1104,18 @@ export default function ProductTableOne() {
       </div>
 
       {/* Pagination */}
-      {filtered.length > 0 && (
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
+      {Array.isArray(filtered) && filtered.length > 0 && (
+        <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 rounded border dark:text-white text-gray-dark disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded border dark:text-white text-gray-dark disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            windowSize={3}
+          />
         </div>
       )}
 
