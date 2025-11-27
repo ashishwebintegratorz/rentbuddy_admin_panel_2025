@@ -20,6 +20,7 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import Product from "./pages/Tables/Product";
+import RentalHistoryTable from "./pages/Tables/RentHistoryTable";
 
 export default function App() {
   return (
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/repair" element={<Repair />} />
             <Route path="/track" element={<Track />} />
             <Route path="/complaints" element={<Complaint />} />
+            <Route path="/rent-history" element={< RentalHistoryTable/>} />
           </Route>
 
           {/* Auth Layout */}

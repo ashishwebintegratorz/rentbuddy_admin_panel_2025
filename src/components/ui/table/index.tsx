@@ -1,64 +1,79 @@
-import { ReactNode } from "react";
+import * as React from "react";
 
-// Props for Table
-interface TableProps {
-  children: ReactNode; // Table content (thead, tbody, etc.)
-  className?: string; // Optional className for styling
-}
-
-// Props for TableHeader
-interface TableHeaderProps {
-  children: ReactNode; // Header row(s)
-  className?: string; // Optional className for styling
-}
-
-// Props for TableBody
-interface TableBodyProps {
-  children: ReactNode; // Body row(s)
-  className?: string; // Optional className for styling
-}
-
-// Props for TableRow
-interface TableRowProps {
-  children: ReactNode; // Cells (th or td)
-  className?: string; // Optional className for styling
-}
-
-// Props for TableCell
-interface TableCellProps {
-  children: ReactNode; // Cell content
-  isHeader?: boolean; // If true, renders as <th>, otherwise <td>
-  className?: string; // Optional className for styling
-}
+// Allow native HTML attributes (like onClick) on table elements
+type NativeProps<T> = React.HTMLAttributes<T> & { className?: string };
 
 // Table Component
-const Table: React.FC<TableProps> = ({ children, className }) => {
-  return <table className={`min-w-full  ${className}`}>{children}</table>;
+export const Table: React.FC<NativeProps<HTMLTableElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <table className={`min-w-full ${className}`} {...props}>
+      {children}
+    </table>
+  );
 };
 
 // TableHeader Component
-const TableHeader: React.FC<TableHeaderProps> = ({ children, className }) => {
-  return <thead className={className}>{children}</thead>;
+export const TableHeader: React.FC<NativeProps<HTMLTableSectionElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <thead className={className} {...props}>
+      {children}
+    </thead>
+  );
 };
 
 // TableBody Component
-const TableBody: React.FC<TableBodyProps> = ({ children, className }) => {
-  return <tbody className={className}>{children}</tbody>;
+export const TableBody: React.FC<NativeProps<HTMLTableSectionElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <tbody className={className} {...props}>
+      {children}
+    </tbody>
+  );
 };
 
-// TableRow Component
-const TableRow: React.FC<TableRowProps> = ({ children, className }) => {
-  return <tr className={className}>{children}</tr>;
+// TableRow Component (FIXED: now supports onClick)
+export const TableRow: React.FC<NativeProps<HTMLTableRowElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <tr className={className} {...props}>
+      {children}
+    </tr>
+  );
 };
 
-// TableCell Component
-const TableCell: React.FC<TableCellProps> = ({
+// TableCell Component (FIXED: supports onClick)
+interface TableCellProps
+  extends React.TdHTMLAttributes<HTMLTableCellElement> {
+  children: React.ReactNode;
+  isHeader?: boolean;
+  className?: string;
+}
+
+export const TableCell: React.FC<TableCellProps> = ({
   children,
   isHeader = false,
   className,
+  ...props
 }) => {
   const CellTag = isHeader ? "th" : "td";
-  return <CellTag className={` ${className}`}>{children}</CellTag>;
-};
 
-export { Table, TableHeader, TableBody, TableRow, TableCell };
+  return (
+    <CellTag className={className} {...props}>
+      {children}
+    </CellTag>
+  );
+};
