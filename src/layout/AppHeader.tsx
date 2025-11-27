@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-
 import { Link } from "react-router";
 import { useSidebar } from "../context/SidebarContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
@@ -12,7 +11,7 @@ const AppHeader: React.FC = () => {
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
   const handleToggle = () => {
-    if (window.innerWidth >= 1024) {
+    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
       toggleSidebar();
     } else {
       toggleMobileSidebar();
@@ -20,7 +19,7 @@ const AppHeader: React.FC = () => {
   };
 
   const toggleApplicationMenu = () => {
-    setApplicationMenuOpen(!isApplicationMenuOpen);
+    setApplicationMenuOpen((prev) => !prev);
   };
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -34,18 +33,19 @@ const AppHeader: React.FC = () => {
     };
 
     document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   return (
-    <header className="sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
-      <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
-        <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
+    <header className="sticky top-0 z-[9999] flex w-full border-b border-white/10 bg-gradient-to-br from-white/80 via-white/60 to-white/30  dark:border-white/10 dark:from-slate-950/80 dark:via-slate-950/70 dark:to-slate-900/60">
+      {/* soft glow across header */}
+      <div className="pointer-events-none absolute inset-x-16 -top-10 h-16 rounded-full bg-gradient-to-r from-blue-500/25 via-purple-500/20 to-emerald-400/20 blur-3xl" />
+
+      <div className="relative flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
+        {/* Left: sidebar toggle + mobile logo + mobile menu toggle */}
+        <div className="flex w-full items-center justify-between gap-2 px-3 py-3 sm:gap-4 lg:justify-normal lg:px-0 lg:py-4">
           <button
-            className="items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
+            className="z-[10000] flex h-10 w-10 items-center justify-center rounded-xl border border-white/30 bg-white/40 text-slate-600 shadow-sm outline-none backdrop-blur-xl transition hover:bg-white/80 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-900/90 lg:h-11 lg:w-11"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
@@ -80,25 +80,19 @@ const AppHeader: React.FC = () => {
                 />
               </svg>
             )}
-            {/* Cross Icon */}
           </button>
 
+          {/* mobile logo (optional) */}
           <Link to="/" className="lg:hidden">
-            <img
-              className="dark:hidden"
-              src="./images/logo/logo.svg"
-              alt="Logo"
-            />
-            <img
-              className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
-              alt="Logo"
-            />
+            <span className="rounded-xl bg-white/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-slate-900 shadow-sm dark:bg-slate-900/70 dark:text-slate-100">
+              RENTBUDDY
+            </span>
           </Link>
 
+          {/* mobile app menu toggle */}
           <button
             onClick={toggleApplicationMenu}
-            className="flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-700 transition hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-900/70 lg:hidden"
           >
             <svg
               width="24"
@@ -115,22 +109,18 @@ const AppHeader: React.FC = () => {
               />
             </svg>
           </button>
-
-          
         </div>
+
+        {/* Right side: theme + notifications + user */}
         <div
           className={`${
             isApplicationMenuOpen ? "flex" : "hidden"
-          } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
+          } w-full items-center justify-between gap-4 px-5 py-4 text-sm lg:flex lg:justify-end lg:px-0`}
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
-            {/* <!-- Dark Mode Toggler --> */}
             <ThemeToggleButton />
-            {/* <!-- Dark Mode Toggler --> */}
             <NotificationDropdown />
-            {/* <!-- Notification Menu Area --> */}
           </div>
-          {/* <!-- User Area --> */}
           <UserDropdown />
         </div>
       </div>

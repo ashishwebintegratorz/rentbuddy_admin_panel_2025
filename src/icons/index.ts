@@ -54,8 +54,12 @@ import { ReactComponent as ChatIcon } from "./chat.svg?react";
 import { ReactComponent as MoreDotIcon } from "./moredot.svg?react";
 import { ReactComponent as AlertHexaIcon } from "./alert-hexa.svg?react";
 import { ReactComponent as ErrorHexaIcon } from "./info-hexa.svg?react";
+import { ReactComponent as PaymentIcon } from "./payment.svg?react";
+import { ReactComponent as OrderIcon } from "./order.svg?react";
 
 export {
+  PaymentIcon,
+  OrderIcon,
   ErrorHexaIcon,
   AlertHexaIcon,
   MoreDotIcon,
