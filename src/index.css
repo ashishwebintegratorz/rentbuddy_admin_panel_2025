@@ -27,26 +27,26 @@ input[type="number"] {
 
 /* Horizontal scrollbar styling for the repair table */
 .table-scrollbar {
-  scrollbar-width: thin;                 /* Firefox */
-  scrollbar-color: #4b5563 #ffffff;      /* thumb, track */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #4b5563 #ffffff; /* thumb, track */
 }
 
 .table-scrollbar::-webkit-scrollbar {
-  height: 10px;                           /* horizontal scrollbar height */
+  height: 10px; /* horizontal scrollbar height */
 }
 
 .table-scrollbar::-webkit-scrollbar-track {
-  background: #000000;                   /* near-black to match your UI */
+  background: #000000; /* near-black to match your UI */
   border-radius: 9999px;
 }
 
 .table-scrollbar::-webkit-scrollbar-thumb {
-  background: #4b5563;                   /* gray-600 thumb */
+  background: #4b5563; /* gray-600 thumb */
   border-radius: 9999px;
 }
 
 .table-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;                   /* lighter on hover */
+  background: #6b7280; /* lighter on hover */
 }
 
 .dark .table-scrollbar {
@@ -139,7 +139,7 @@ input[type="number"] {
   --color-gray-500: #667085;
   --color-gray-600: #475467;
   --color-gray-700: #344054;
-  --color-gray-800: #0F0909FF;
+  --color-gray-800: #0f0909ff;
   --color-gray-850: #0f0f0f;
   --color-gray-900: #000;
   --color-gray-950: #0c111d;
@@ -271,7 +271,10 @@ input[type="number"] {
 }
 
 @utility menu-item-icon-active {
-  @apply text-brand-500 dark:text-brand-400;
+  @apply text-brand-500 dark:text-brand-400
+   [&_svg]:!fill-brand-500 
+         [&_path]:!fill-brand-500 
+         [&_path]:!stroke-brand-500;
 }
 
 @utility menu-item-icon-size {
@@ -281,7 +284,10 @@ input[type="number"] {
 }
 
 @utility menu-item-icon-inactive {
-  @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
+  @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300
+   [&_svg]:!fill-gray-500 
+         [&_path]:!fill-gray-500 
+         [&_path]:!stroke-gray-500;
 }
 
 @utility menu-item-arrow {

@@ -8,7 +8,7 @@ import {
   HorizontaLDots,
   UserCircleIcon,
   PaymentIcon,
-  OrderIcon
+  OrderIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -39,7 +39,8 @@ const navItems: NavItem[] = [
 
   {
     name: "Order Management",
-    icon: <OrderIcon className="text-[#667085]"/>,
+
+    icon: <OrderIcon />,
     subItems: [
       { name: "Orders", path: "/orders" },
       { name: "Subscriptions", path: "/subscriptions" },
