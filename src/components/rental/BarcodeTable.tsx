@@ -27,14 +27,14 @@ const BarcodeTable: React.FC<Props> = ({ barcodes, onSelectBarcode }) => {
   const { isExpanded } = useSidebar(); // still available if you adjust layout later
 
   return (
-    <div className="max-w-full overflow-x-auto rounded-xl border border-white/20 bg-white/30 shadow-inner backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/40 table-scrollbar">
+    <div className="max-w-full overflow-x-auto rounded-xl border border-white/20 bg-white/30 shadow-[0_18px_40px_rgba(15,23,42,0.28)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/40 table-scrollbar">
       <Table className="min-w-[950px]">
         <TableHeader className="border-b border-white/20 bg-gradient-to-r from-slate-100/60 via-white/40 to-slate-100/60 text-xs uppercase tracking-[0.08em] text-slate-500 backdrop-blur-sm dark:border-white/10 dark:from-slate-900/80 dark:via-slate-900/50 dark:to-slate-900/80 dark:text-slate-400">
           <TableRow>
             <TableCell isHeader className="px-4 py-3 font-semibold">
               Product Name
             </TableCell>
-           
+
             <TableCell isHeader className="px-4 py-3 font-semibold">
               Serial No.
             </TableCell>
@@ -76,7 +76,7 @@ const BarcodeTable: React.FC<Props> = ({ barcodes, onSelectBarcode }) => {
                 <TableCell className="px-4 py-4 text-sm text-slate-800 dark:text-slate-100 text-left">
                   {b.rentalItem?.productName || "-"}
                 </TableCell>
-                
+
                 <TableCell className="px-4 py-4 text-sm text-slate-700 dark:text-slate-300">
                   {b.rentalItem?.productSerialID || "-"}
                 </TableCell>

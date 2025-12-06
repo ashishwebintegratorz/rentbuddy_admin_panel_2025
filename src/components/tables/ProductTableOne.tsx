@@ -238,7 +238,7 @@ function EditProductForm({
           value={product.description || ""}
           onChange={onChange}
           placeholder="Enter product description"
-          className="w-full px-4 py-2 border rounded-lgtext-base h-24 resize-none dark:bg-gray-900 dark:text-white"
+          className="w-full px-4 py-2 border rounded-lg text-base h-24 resize-none dark:bg-gray-900 dark:text-white"
         />
       </div>
 
@@ -251,6 +251,7 @@ function EditProductForm({
           <label className="cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium py-2.5 px-5 rounded-lg transition duration-300 hover:from-blue-600 hover:to-indigo-700 active:scale-95">
             <input
               type="file"
+              name="productImage" // optional; actual key comes from FormData mapping
               accept="image/*"
               onChange={onFileChange}
               className="hidden"
@@ -463,7 +464,6 @@ export default function ProductTableOne() {
     };
     stocks?: number;
     productId?: string;
-    // Add other relevant fields based on your product structure
   }
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -471,7 +471,7 @@ export default function ProductTableOne() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [menuOpen, setMenuOpen] = useState(null);
+  const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const [catOpen, setCatOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
 
@@ -483,6 +483,7 @@ export default function ProductTableOne() {
     type: string;
     product: Product | null;
   }>({ open: false, type: "", product: null });
+
   const [editProduct, setEditProduct] = useState<{
     _id?: string;
     productName?: string;
@@ -495,6 +496,7 @@ export default function ProductTableOne() {
     description?: string;
     image?: File | string | null;
   }>({});
+
   const [editOffer, setEditOffer] = useState({});
   const [editDiscount, setEditDiscount] = useState({
     threeMonths: "",
@@ -504,6 +506,7 @@ export default function ProductTableOne() {
 
   const itemsPerPage = 10;
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
+
   const [newProduct, setNewProduct] = useState({
     productName: "",
     category: "",
@@ -516,7 +519,13 @@ export default function ProductTableOne() {
     image: null as File | null,
   });
 
-  const handleNewProductChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNewProductChange = (
+    e:
+      | React.ChangeEvent<
+          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
+      | { target: { name: string; value: string } }
+  ) => {
     const { name, value } = e.target;
     setNewProduct((prev) => ({ ...prev, [name]: value }));
   };
@@ -534,7 +543,7 @@ export default function ProductTableOne() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${BASE_API_URL}/products/getProduct`, {
-        headers: { Authorization: token },
+        headers: { Authorization: token || "" },
       });
       const data = res?.data?.data ?? res?.data ?? [];
       setProducts(Array.isArray(data) ? data : []);
@@ -653,7 +662,7 @@ export default function ProductTableOne() {
       await axios.put(`${BASE_API_URL}/products/editProduct`, productData, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token,
+          Authorization: token || "",
         },
       });
       toast.success("Product edited successfully!");
@@ -678,7 +687,7 @@ export default function ProductTableOne() {
         editOffer,
         {
           headers: {
-            Authorization: token,
+            Authorization: token || "",
             "Content-Type": "application/json",
           },
         }
@@ -703,7 +712,7 @@ export default function ProductTableOne() {
         `${BASE_API_URL}/products/deleteProduct/${modal.product._id}`,
         {
           headers: {
-            Authorization: token,
+            Authorization: token || "",
           },
         }
       );
@@ -732,7 +741,7 @@ export default function ProductTableOne() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: token,
+            Authorization: token || "",
           },
         }
       );
@@ -744,6 +753,7 @@ export default function ProductTableOne() {
       toast.error("Failed to update discount");
     }
   };
+
   const handleAddProductSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
@@ -751,13 +761,19 @@ export default function ProductTableOne() {
     try {
       const token = localStorage.getItem("token");
       const formData = new FormData();
-      // iterate keys with a typed array so TypeScript knows the key is a keyof newProduct
+
       (Object.keys(newProduct) as (keyof typeof newProduct)[]).forEach(
         (key) => {
           const value = newProduct[key];
           if (value !== null && value !== undefined) {
-            // Note: your backend expects "stock" not "stocks"
-            const formKey = key === "stocks" ? "stock" : key;
+            // ✅ Map frontend keys to backend field names
+            const formKey =
+              key === "stocks"
+                ? "stock" // backend uses stock
+                : key === "image"
+                ? "productImage" // backend multer expects productImage
+                : key;
+
             if (value instanceof File) {
               formData.append(formKey, value);
             } else {
@@ -766,12 +782,14 @@ export default function ProductTableOne() {
           }
         }
       );
+
       await axios.post(`${BASE_API_URL}/products/addProduct`, formData, {
         headers: {
-          Authorization: token,
-          "Content-Type": "multipart/form-data",
+          Authorization: token || "",
+          // Let Axios set Content-Type with boundary automatically
         },
       });
+
       toast.success("Product added successfully!");
       setNewProduct({
         productName: "",
@@ -1144,7 +1162,7 @@ export default function ProductTableOne() {
           Edit Offer
         </h3>
         <EditOfferForm
-          offer={editOffer}
+          offer={editOffer as Offer}
           onChange={handleEditOfferChange}
           onSubmit={handleEditOfferSubmit}
           onCancel={closeModal}
@@ -1193,6 +1211,7 @@ export default function ProductTableOne() {
           onCancel={closeModal}
         />
       </ModalWrapper>
+
       <ModalWrapper
         isOpen={modal.open && modal.type === "add-product"}
         onClose={closeModal}
@@ -1206,7 +1225,7 @@ export default function ProductTableOne() {
           onFileChange={handleNewProductFileChange}
           onSubmit={handleAddProductSubmit}
           onCancel={closeModal}
-          isAdd={true} // optional prop to mark this is add mode (you can handle image required validation)
+          isAdd={true}
         />
       </ModalWrapper>
     </div>

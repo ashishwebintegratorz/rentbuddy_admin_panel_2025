@@ -32,7 +32,7 @@ const RentalHistoryPanel: React.FC<Props> = ({ selectedBarcode, onBack }) => {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:-translate-y-[1px] hover:bg-white/90 hover:shadow-[0_8px_20px_rgba(15,23,42,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 focus-visible:ring-offset-0 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-slate-900"
+        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:-translate-y-[1px] hover:bg-white/90 shadow-[0_18px_40px_rgba(15,23,42,0.28)] backdrop-blur-xl  dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-slate-900"
       >
         <span>←</span>
         <span>Back</span>

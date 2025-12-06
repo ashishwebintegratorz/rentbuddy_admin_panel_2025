@@ -29,7 +29,7 @@ export default function DemographicCard() {
       <div className="px-4 py-6 my-6 overflow-hidden border border-gary-200 rounded-2xl dark:border-gray-800 sm:px-6">
         <div
           id="mapOne"
-          className="mapOne map-btn -mx-4 -my-6 h-[212px] w-[252px] 2xsm:w-[307px] xsm:w-[358px] sm:-mx-6 md:w-[668px] lg:w-[634px] xl:w-[393px] 2xl:w-[554px]"
+          className="mapOne map-btn -mx-4 -my-6 h-[212px] w-[252px] 2xsm:w-[307px] xsm:w-[758px] sm:-mx-6 md:w-[668px] lg:w-[1434px] xl:w-[793px] 2xl:w-[1454px]"
         >
           <CountryMap />
         </div>
@@ -43,7 +43,7 @@ export default function DemographicCard() {
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-theme-sm dark:text-white/90">
-                Madhya Pradesh
+                Gujarat
               </p>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                 2,379 Customers
@@ -68,7 +68,7 @@ export default function DemographicCard() {
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-theme-sm dark:text-white/90">
-                Gujarat
+                Madhya Pradesh
               </p>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                 589 Customers
