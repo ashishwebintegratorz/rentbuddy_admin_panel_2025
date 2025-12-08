@@ -4,6 +4,7 @@ import SidebarProducts from "../../components/rental/SidebarProducts";
 import BarcodeTable from "../../components/rental/BarcodeTable";
 import RentalHistoryPanel from "../../components/rental/RentalHistoryPanel";
 import { motion, AnimatePresence } from "framer-motion";
+import { Pagination } from "../ui/pagination/Pagination";
 
 export interface RentalItem {
   productID: string;
@@ -54,30 +55,39 @@ const RentalStockPage: React.FC = () => {
   const [selectedProductID, setSelectedProductID] = useState<string | null>(
     null
   );
-  const [selectedBarcode, setSelectedBarcode] =
-    useState<BarcodeRecord | null>(null);
+  const [selectedBarcode, setSelectedBarcode] = useState<BarcodeRecord | null>(
+    null
+  );
+
+  // ⬇ Pagination states
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
-  useEffect(() => {
-    const fetchBarcodes = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${BASE_API_URL}/barcode/getAllBarcodes`, {
-          headers: { Authorization: token ? `Bearer ${token}` : "" },
-        });
-        setBarcodes(res.data.data || []);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch rental barcodes");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchBarcodes = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `${BASE_API_URL}/barcode/getAllBarcodes?page=${page}&limit=${limit}`,
+        { headers: { Authorization: token ? `Bearer ${token}` : "" } }
+      );
 
+      setBarcodes(res.data?.data || []);
+      setTotalPages(res.data?.totalPages || 1);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch rental barcodes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchBarcodes();
-  }, [BASE_API_URL]);
+  }, [BASE_API_URL, page]); // 🔥 page change triggers fetching
 
   const products = useMemo(() => {
     const map = new Map<
@@ -95,7 +105,7 @@ const RentalStockPage: React.FC = () => {
   }, [barcodes]);
 
   const filteredBarcodes = useMemo(() => {
-    if (!selectedProductID) return [];
+    if (!selectedProductID) return barcodes;
     return barcodes.filter(
       (b) => b.rentalItem && b.rentalItem.productID === selectedProductID
     );
@@ -116,7 +126,6 @@ const RentalStockPage: React.FC = () => {
       <div className="pointer-events-none absolute -right-32 bottom-0 h-72 w-72 rounded-full bg-gradient-to-tr from-emerald-400/15 via-cyan-400/15 to-transparent blur-3xl" />
 
       <div className="relative flex flex-col gap-6 lg:flex-row">
-        {/* Sidebar */}
         <div className="w-full lg:w-64 flex-col lg:flex-row">
           <SidebarProducts
             products={products}
@@ -128,7 +137,6 @@ const RentalStockPage: React.FC = () => {
           />
         </div>
 
-        {/* Main content */}
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="mb-4 space-y-1">
@@ -140,65 +148,68 @@ const RentalStockPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Breadcrumbs */}
+          {/* Breadcrumb */}
           <div className="mb-4 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-            <span className="cursor-pointer hover:underline">Home</span>
-            <span>/</span>
+            <span className="cursor-pointer hover:underline">Home</span> /
             <span
               className="cursor-pointer hover:underline"
               onClick={() => setSelectedBarcode(null)}
             >
               Rental Stock
             </span>
-            {selectedBarcode && (
-              <>
-                <span>/</span>
-                <span className="font-medium text-slate-800 dark:text-slate-100">
-                  {selectedBarcode.rentalItem?.productName || "History"}
-                </span>
-              </>
-            )}
+            {selectedBarcode && <span>/ History</span>}
           </div>
 
-          {/* Glass inner container */}
-          <div className="max-w-full overflow-hidden rounded-xl border border-white/20 bg-white/30 p-4 shadow-inner backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/40">
+          <div className="max-w-full overflow-hidden rounded-xl border border-white/20 bg-white/30 p-4 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/40">
             {loading && (
-              <p className="py-10 text-center text-sm text-blue-600 dark:text-blue-400">
+              <p className="py-10 text-center text-sm text-blue-600">
                 Loading rental barcodes...
               </p>
             )}
             {error && (
-              <p className="py-10 text-center text-sm text-rose-500">
-                {error}
-              </p>
-            )}
-
-            {!loading && !error && !selectedProductID && (
-              <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                Select a product from the sidebar to view its barcodes.
-              </p>
+              <p className="py-10 text-center text-sm text-rose-500">{error}</p>
             )}
 
             <AnimatePresence mode="wait">
-              {!loading &&
-                !error &&
-                selectedProductID &&
-                selectedBarcode === null && (
-                  <motion.div
-                    key="table"
-                    initial={{ opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    <BarcodeTable
-                      barcodes={filteredBarcodes}
-                      onSelectBarcode={setSelectedBarcode}
-                    />
-                  </motion.div>
-                )}
+              {!loading && !error && selectedBarcode === null && (
+                <motion.div
+                  key="table"
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  <BarcodeTable
+                    barcodes={filteredBarcodes}
+                    onSelectBarcode={setSelectedBarcode}
+                  />
 
-              {!loading && !error && selectedBarcode !== null && (
+                  {/* Pagination UI */}
+                  {/* New Pagination UI like Orders Table */}
+                  {barcodes.length > 0 && (
+                    <div className="mt-5 flex flex-col items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/30 px-4 py-3 text-xs text-slate-600 shadow-sm backdrop-blur-xl sm:flex-row dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-300">
+                      <p className="flex items-center gap-1">
+                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900/5 text-[11px] font-semibold text-slate-700 dark:bg-slate-100/10 dark:text-slate-200">
+                          {page}
+                        </span>
+                        <span className="text-[11px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          of {totalPages} pages
+                        </span>
+                      </p>
+
+                      <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        onPageChange={setPage}
+                        windowSize={3} // number of visible pages
+                        className="w-full sm:w-auto"
+                      />
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {selectedBarcode && (
                 <motion.div
                   key="history"
                   initial={{ opacity: 0, x: 12 }}
