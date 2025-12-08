@@ -21,6 +21,7 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import Product from "./pages/Tables/Product";
 import RentalHistoryTable from "./pages/Tables/RentHistoryTable";
+import InvoiceDetail from "./components/tables/InvoiceDetail";
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="/subscriptions" element={<Subscription />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/invoice" element={<Invoice />} />
+             <Route path="/invoice/:id" element={<InvoiceDetail />} />
             <Route path="/documents" element={<Document />} />
             <Route path="/recurring" element={<Recurring />} />
             <Route path="/repair" element={<Repair />} />

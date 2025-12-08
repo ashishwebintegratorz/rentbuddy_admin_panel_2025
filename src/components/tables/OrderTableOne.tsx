@@ -198,7 +198,7 @@ export default function OrderTableOne() {
               <button
                 type="button"
                 onClick={() => setIsStatusDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/50 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm outline-none backdrop-blur-xl transition hover:bg-white/80 focus:ring-2 focus:ring-indigo-500/60 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-900/90"
+                className="dropdown-toggle flex items-center gap-2 rounded-xl border border-white/30 bg-white/50 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm outline-none backdrop-blur-xl transition hover:bg-white/80 focus:ring-2 focus:ring-indigo-500/60 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-900/90"
               >
                 <span>{statusLabelMap[statusFilter]}</span>
                 <ChevronDown
@@ -245,7 +245,7 @@ export default function OrderTableOne() {
               <button
                 type="button"
                 onClick={() => setIsPaymentDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/50 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm outline-none backdrop-blur-xl transition hover:bg-white/80 focus:ring-2 focus:ring-indigo-500/60 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-900/90"
+                className="dropdown-toggle flex items-center gap-2 rounded-xl border border-white/30 bg-white/50 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm outline-none backdrop-blur-xl transition hover:bg-white/80 focus:ring-2 focus:ring-indigo-500/60 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:bg-slate-900/90"
               >
                 <span>{paymentLabelMap[paymentFilter]}</span>
                 <ChevronDown
@@ -254,7 +254,6 @@ export default function OrderTableOne() {
                   }`}
                 />
               </button>
-
               <Dropdown
                 isOpen={isPaymentDropdownOpen}
                 onClose={() => setIsPaymentDropdownOpen(false)}
