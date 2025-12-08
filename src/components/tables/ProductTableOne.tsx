@@ -539,24 +539,35 @@ export default function ProductTableOne() {
     }));
   };
 
-  const fetchProducts = async () => {
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const fetchProducts = async (page = 1, limit = 10, city = "") => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${BASE_API_URL}/products/getProduct`, {
-        headers: { Authorization: token || "" },
-      });
-      const data = res?.data?.data ?? res?.data ?? [];
-      setProducts(Array.isArray(data) ? data : []);
+
+      const res = await axios.get(
+        `${BASE_API_URL}/products/getProduct?page=${page}&limit=${limit}${
+          city ? `&city=${city}` : ""
+        }`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setProducts(res.data.data || []);
+      setTotalPages(res.data.totalPages);
+      setTotalItems(res.data.totalProducts);
+      setCurrentPage(res.data.page);
     } catch (err) {
-      console.error("Error fetching products:", err);
       toast.error("Failed to fetch products");
       setProducts([]);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [BASE_API_URL]);
+    fetchProducts(currentPage, itemsPerPage);
+  }, [currentPage]);
 
   const filtered = (Array.isArray(products) ? products : []).filter((p) => {
     return (
@@ -571,10 +582,10 @@ export default function ProductTableOne() {
     );
   });
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  // Remove duplicate totalPages calculation here, use the state value instead
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
-  const current = filtered.slice(indexOfFirst, indexOfLast);
+  const current = filtered;
 
   interface AvailabilityBadgeProps {
     availability?: string | null;
@@ -1122,16 +1133,17 @@ export default function ProductTableOne() {
       </div>
 
       {/* Pagination */}
-      {Array.isArray(filtered) && filtered.length > 0 && (
-        <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+      
+      {products.length > 0 && (
+        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            Page {currentPage} of {totalPages}
+            Page {currentPage} of {totalPages} — Total {totalItems} products
           </p>
 
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={(page) => setCurrentPage(page)} // triggers fetch
             windowSize={3}
           />
         </div>

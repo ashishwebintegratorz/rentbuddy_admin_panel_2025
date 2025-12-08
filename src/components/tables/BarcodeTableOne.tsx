@@ -33,33 +33,43 @@ export default function BarcodeTableOne() {
     | "inactive"
   >("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
   // Dropdown open state
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
 
-  // Added states
-  const [viewBarcode, setViewBarcode] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedBarcodes, setSelectedBarcodes] = useState<string[]>([]);
+// Added states
+const [viewBarcode, setViewBarcode] = useState<string | null>(null);
+const [showModal, setShowModal] = useState(false);
+const [selectedBarcodes, setSelectedBarcodes] = useState<string[]>([]);
 
-  const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
+const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
-  // Fetch function (used after returns too)
-  const fetchBarcodes = async () => {
-    try {
-      const res = await axios.get(`${BASE_API_URL}/barcode/getAllBarcodes`);
-      const data = res?.data?.data ?? res?.data ?? [];
-      setBarcodes(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error fetching barcodes:", err);
-      setBarcodes([]);
-    }
-  };
+// Fetch function (used after returns too)
 
-  useEffect(() => {
-    fetchBarcodes();
-  }, [BASE_API_URL]);
+const fetchBarcodes = async (page = 1, limit = 10, status = statusFilter) => {
+  try {
+    const res = await axios.get(
+      `${BASE_API_URL}/barcode/getAllBarcodes?page=${page}&limit=${limit}${
+        status !== "all" ? `&status=${status}` : ""
+      }`
+    );
+
+    setBarcodes(res.data?.data || []);
+    setTotalPages(res.data?.totalPages || 1);  // <-- important
+    setCurrentPage(res.data?.page || page);    // <-- important
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+
+
+ useEffect(() => {
+  fetchBarcodes(currentPage, itemsPerPage, statusFilter);
+}, [currentPage, statusFilter]);
 
   // Safe filtered list applying search & status filter
   const filtered = (Array.isArray(barcodes) ? barcodes : []).filter(
@@ -81,12 +91,9 @@ export default function BarcodeTableOne() {
     }
   );
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
-  const current = Array.isArray(filtered)
-    ? filtered.slice(indexOfFirst, indexOfLast)
-    : [];
+  const current = filtered;
 
   // Status badge component
   const StatusBadge = ({ status }: { status: string }) => {
@@ -557,20 +564,20 @@ export default function BarcodeTableOne() {
 
       {/* Pagination */}
       {/* Pagination */}
-      {Array.isArray(filtered) && filtered.length > 0 && (
-        <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Page {currentPage} of {totalPages}
-          </p>
+      {barcodes.length > 0 && (
+  <div className="mt-4 flex items-center justify-between text-sm">
+    <p>Page {currentPage} of {totalPages}</p>
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            windowSize={3}
-          />
-        </div>
-      )}
+    <Pagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={setCurrentPage} // click will auto fetch
+      windowSize={3}
+    />
+  </div>
+)}
+
+
 
       {/* Modal */}
       {showModal && (
