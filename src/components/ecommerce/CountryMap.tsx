@@ -118,7 +118,7 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
   }
 
   return (
-    <div className="w-[1400px] h-full relative z-10">
+    <div className="h-full relative z-10">
       <style>
         {`
           .jvectormap-tip {
