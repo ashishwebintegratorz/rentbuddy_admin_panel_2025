@@ -89,7 +89,7 @@ const PaymentsTableOne: React.FC = () => {
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("token");
       const res = await axios.get(
         `${BASE_API_URL}/payments/getPayments?page=${page}&limit=${limit}`,
         {
