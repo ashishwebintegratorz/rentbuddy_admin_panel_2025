@@ -16,7 +16,7 @@ export default function SignInForm() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
@@ -28,13 +28,14 @@ export default function SignInForm() {
       });
 
       setMessage("Login successful ✔");
-      localStorage.setItem("token", res.data.token); // optional
+      localStorage.setItem("token", res.data.data); // optional
       localStorage.setItem("user", JSON.stringify(res.data.user));
      
 
       navigate("/"); // change as per route
     } catch (err) {
-      setMessage(err.response?.data?.message || "Login failed ❌");
+      const errorMessage = axios.isAxiosError(err) ? err.response?.data?.message : "Login failed ❌";
+      setMessage(errorMessage || "Login failed ❌");
     } finally {
       setLoading(false);
     }
@@ -102,7 +103,6 @@ export default function SignInForm() {
 
               <div>
                 <Button
-                  type="submit"
                   className="w-full"
                   size="sm"
                   disabled={loading}

@@ -22,6 +22,7 @@ import Home from "./pages/Dashboard/Home";
 import Product from "./pages/Tables/Product";
 import RentalHistoryTable from "./pages/Tables/RentHistoryTable";
 import InvoiceDetail from "./components/tables/InvoiceDetail";
+import ProtectedRoute from "./components/protected/ProtectedRoutes";
 
 export default function App() {
   return (
@@ -41,20 +42,20 @@ export default function App() {
 
             {/* Tables */}
             <Route path="/basic-tables" element={<BasicTables />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/barcode" element={<Barcode />} />
-            <Route path="/products" element={<Product />} />
-            <Route path="/subscriptions" element={<Subscription />} />
-            <Route path="/payments" element={<Payments />} />
-            <Route path="/invoice" element={<Invoice />} />
-             <Route path="/invoice/:id" element={<InvoiceDetail />} />
-            <Route path="/documents" element={<Document />} />
-            <Route path="/recurring" element={<Recurring />} />
-            <Route path="/repair" element={<Repair />} />
-            <Route path="/track" element={<Track />} />
-            <Route path="/complaints" element={<Complaint />} />
-            <Route path="/rent-history" element={< RentalHistoryTable/>} />
+            <Route path="/customers" element={<ProtectedRoute allowedRoles={["admin","customer manager"]}><Customers /></ProtectedRoute>} />
+            <Route path="/orders" element={<ProtectedRoute allowedRoles={["admin","Order manager"]}><Orders /></ProtectedRoute>} />
+            <Route path="/barcode" element={<ProtectedRoute allowedRoles={["admin","Product manager"]}><Barcode /></ProtectedRoute>} />
+            <Route path="/products" element={<ProtectedRoute allowedRoles={["admin","Product manager"]}><Product /></ProtectedRoute>} />
+            <Route path="/subscriptions" element={<ProtectedRoute allowedRoles={["admin","Order manager"]}><Subscription /></ProtectedRoute>} />
+            <Route path="/payments" element={<ProtectedRoute allowedRoles={["admin","Finance manager"]}><Payments /></ProtectedRoute>} />
+            <Route path="/invoice" element={<ProtectedRoute allowedRoles={["admin","Finance manager"]}><Invoice /></ProtectedRoute>} />
+             <Route path="/invoice/:id" element={<ProtectedRoute allowedRoles={["admin","Finance manager"]}><InvoiceDetail /></ProtectedRoute>} />
+            <Route path="/documents" element={<ProtectedRoute allowedRoles={["admin","Finance manager"]}><Document /></ProtectedRoute>} />
+            <Route path="/recurring" element={<ProtectedRoute allowedRoles={["admin","Order manager"]}><Recurring /></ProtectedRoute>} />
+            <Route path="/repair" element={<ProtectedRoute allowedRoles={["admin","Order manager"]}><Repair /></ProtectedRoute>} />
+            <Route path="/track" element={<ProtectedRoute allowedRoles={["admin","Product manager"]}><Track /></ProtectedRoute>} />
+            <Route path="/complaints" element={<ProtectedRoute allowedRoles={["admin","customer manager"]}><Complaint /></ProtectedRoute>} />
+            <Route path="/rent-history" element={<ProtectedRoute allowedRoles={["admin","customer manager"]}>< RentalHistoryTable/></ProtectedRoute>} />
           </Route>
 
           {/* Auth Layout */}
