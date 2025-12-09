@@ -81,19 +81,29 @@ const InvoiceDetail: React.FC = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!id) return;
+  const fetchInvoice = async () => {
+  if (!id) return;
+  try {
     setLoading(true);
-    axios
-      .get<InvoiceResponse>(`${BASE_API_URL}/orders/getInvoice/${id}`)
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching invoice detail:", err);
-      })
-      .finally(() => setLoading(false));
-  }, [id, BASE_API_URL]);
+    
+    const res = await axios.get<InvoiceResponse>(
+      `${BASE_API_URL}/orders/getInvoice/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },}
+    );
+    setData(res.data);
+  } catch (err) {
+    console.error("Error fetching invoice detail:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchInvoice();
+}, [id, BASE_API_URL]);
+
 
   const handleDownloadPdf = async () => {
     if (!data || !data.invoice) return;

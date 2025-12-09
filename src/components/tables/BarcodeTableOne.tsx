@@ -50,10 +50,17 @@ const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
 const fetchBarcodes = async (page = 1, limit = 10, status = statusFilter) => {
   try {
+    const token = localStorage.getItem("token");
     const res = await axios.get(
       `${BASE_API_URL}/barcode/getAllBarcodes?page=${page}&limit=${limit}${
         status !== "all" ? `&status=${status}` : ""
-      }`
+      }`,
+      {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      
     );
 
     setBarcodes(res.data?.data || []);

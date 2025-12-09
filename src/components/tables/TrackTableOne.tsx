@@ -9,6 +9,10 @@ import {
 } from "../ui/table";
 import Button from "../ui/button/Button";
 import { toast } from "react-toastify";
+import { ChevronDown } from "lucide-react";
+import { Dropdown } from "../ui/dropdown/Dropdown";
+import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { Pagination } from "../ui/pagination/Pagination";
 
 interface Product {
   _id: string;
@@ -34,6 +38,8 @@ const TrackTableOne: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [cityDropdown, setCityDropdown] = useState(false);
+
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
   useEffect(() => {
@@ -47,9 +53,7 @@ const TrackTableOne: React.FC = () => {
       const token = localStorage.getItem("token");
       const response = await axios.get(
         `${BASE_API_URL}/products/trackProductsRoute`,
-        {
-          headers: { Authorization: token ? `Bearer ${token}` : "" },
-        }
+        { headers: { Authorization: token ? `Bearer ${token}` : "" } }
       );
       setProducts(response.data || []);
     } catch (err: any) {
@@ -60,38 +64,34 @@ const TrackTableOne: React.FC = () => {
     }
   };
 
-  const makeTrackingId = (productName: string) => {
-    if (!productName) return "N/A";
-    return productName
-      .split(" ")
-      .slice(0, 4)
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase();
-  };
+  const makeTrackingId = (name: string) =>
+    name
+      ? name
+          .split(" ")
+          .slice(0, 4)
+          .map((w) => w[0])
+          .join("")
+          .toUpperCase()
+      : "N/A";
 
-  const allTrackingRows: TrackingRow[] = products.map((p) => ({
+  const rows: TrackingRow[] = products.map((p) => ({
     trackingId: `${makeTrackingId(p.productName)}#${p._id.slice(-4)}`,
     productName: p.productName,
     city: p.city || "N/A",
     remainingStock: p.stocks,
   }));
 
-  const filteredRows = allTrackingRows.filter((row) => {
-    const matchSearch =
-      !search ||
-      row.trackingId.toLowerCase().includes(search.toLowerCase()) ||
-      row.productName.toLowerCase().includes(search.toLowerCase());
+  const filtered = rows.filter(
+    (row) =>
+      (!search ||
+        row.trackingId.toLowerCase().includes(search.toLowerCase()) ||
+        row.productName.toLowerCase().includes(search.toLowerCase())) &&
+      (!cityFilter || row.city.toLowerCase() === cityFilter.toLowerCase())
+  );
 
-    const matchCity =
-      !cityFilter || row.city.toLowerCase() === cityFilter.toLowerCase();
-
-    return matchSearch && matchCity;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / itemsPerPage));
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const start = (currentPage - 1) * itemsPerPage;
-  const currentRows = filteredRows.slice(start, start + itemsPerPage);
+  const current = filtered.slice(start, start + itemsPerPage);
 
   const cityOptions = Array.from(
     new Set(products.map((p) => p.city).filter(Boolean))
@@ -99,152 +99,128 @@ const TrackTableOne: React.FC = () => {
 
   return (
     <Fragment>
-      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5 flex flex-col h-[82vh] min-h-0 table-scrollbar">
-        {/* Header */}
+      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5">
+        
+        {/* HEADER + FILTERS */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
             Product Tracking
           </h2>
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            
+            {/* Search Input */}
             <input
               type="text"
-              placeholder="Search Tracking ID or Product..."
-              className="w-full sm:w-64 rounded-lg border border-gray-300 dark:border-white/[0.1] bg-white/80 dark:bg-transparent px-3 py-2 text-sm dark:text-white"
+              placeholder="Search by Tracking ID or Product..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              autoComplete="off"
-              spellCheck={false}
+              className="w-full sm:w-64 rounded-lg border border-gray-300 dark:border-white/[0.1]
+              bg-white dark:bg-transparent px-3 py-2 text-sm focus:outline-none 
+              focus:ring-2 focus:ring-gray-700 dark:text-white"
             />
-            <select
-              className="
-    w-full sm:w-48 rounded-lg 
-    border border-gray-300 
-    dark:border-white/[0.1] 
-    bg-white dark:bg-neutral-950 
-    px-3 py-2 text-sm 
-    text-gray-800 dark:text-white
-  "
-              value={cityFilter}
-              onChange={(e) => {
-                setCityFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option
-                value=""
-                className="bg-white dark:bg-neutral-900 text-gray-dark dark:text-white"
-              >
-                All Cities
-              </option>
 
-              {cityOptions.map((city) => (
-                <option
-                  key={city}
-                  value={city}
-                  className="bg-white dark:bg-neutral-900 text-gray-dark dark:text-white"
+            {/* CITY FILTER DROPDOWN */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setCityDropdown((p) => !p)}
+                className="flex items-center gap-2 bg-white dark:bg-neutral-900 border border-gray-300 
+                dark:border-neutral-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-lg
+                focus:outline-none shadow-sm text-sm"
+              >
+                <span>{cityFilter || "All Cities"}</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+
+              <Dropdown
+                isOpen={cityDropdown}
+                onClose={() => setCityDropdown(false)}
+                className="w-48"
+              >
+                <DropdownItem
+                  onItemClick={() => {
+                    setCityFilter("");
+                    setCityDropdown(false);
+                    setCurrentPage(1);
+                  }}
                 >
-                  {city}
-                </option>
-              ))}
-            </select>
+                  All Cities
+                </DropdownItem>
+
+                {cityOptions.map((city) => (
+                  <DropdownItem
+                    key={city}
+                    onItemClick={() => {
+                      setCityFilter(city);
+                      setCityDropdown(false);
+                      setCurrentPage(1);
+                    }}
+                  >
+                    {city}
+                  </DropdownItem>
+                ))}
+              </Dropdown>
+            </div>
           </div>
         </div>
 
-        {/* Table */}
-        <div
-          className="overflow-auto flex-grow rounded-lg"
-          style={{ minHeight: 0 }}
-        >
-          {loading && (
-            <p className="text-center text-blue-600 py-8">Loading...</p>
-          )}
-          {error && <p className="text-center text-red-600 py-8">{error}</p>}
+        {/* TABLE */}
+        <div className="overflow-auto rounded-lg">
+          {loading && <p className="text-center py-8 text-blue-600">Loading...</p>}
+          {error && <p className="text-center py-8 text-red-600">{error}</p>}
+
           {!loading && !error && (
             <Table>
-              <TableHeader className="border-b border-gray-200 bg-gray-50 dark:bg-white/[0.05]">
+              <TableHeader className="border-b bg-gray-50 dark:bg-white/[0.05]">
                 <TableRow>
-                  <TableCell
-                    isHeader
-                    className="min-w-[160px] dark:text-white text-gray-dark"
-                  >
-                    Tracking ID
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="min-w-[200px] dark:text-white text-gray-dark"
-                  >
-                    Product Name
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="min-w-[140px] dark:text-white text-gray-dark"
-                  >
-                    City
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="min-w-[100px] dark:text-white text-gray-dark"
-                  >
-                    Stock
-                  </TableCell>
+                  <TableCell isHeader className="px-5 py-3 dark:text-white">Tracking ID</TableCell>
+                  <TableCell isHeader className="px-5 py-3 dark:text-white">Product</TableCell>
+                  <TableCell isHeader className="px-5 py-3 dark:text-white text-center">City</TableCell>
+                  <TableCell isHeader className="px-5 py-3 dark:text-white text-center">Remaining Stock</TableCell>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                {currentRows.length === 0 ? (
+                {current.length > 0 ? (
+                  current.map((row, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="px-5 py-3 text-center dark:text-white">{row.trackingId}</TableCell>
+                      <TableCell className="px-5 py-3 text-center dark:text-white">{row.productName}</TableCell>
+                      <TableCell className="px-5 py-3 text-center dark:text-white">{row.city}</TableCell>
+                      <TableCell className="px-5 py-3 text-center dark:text-white">{row.remainingStock}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="py-6 text-center text-gray-500 italic"
-                    >
+                    <TableCell colSpan={4} className="text-center py-6 text-gray-500 italic">
                       No products found.
                     </TableCell>
                   </TableRow>
-                ) : (
-                  currentRows.map((row, idx) => (
-                    <TableRow key={`${row.trackingId}-${idx}`}>
-                      <TableCell className="dark:text-white text-gray-dark text-center py-3">
-                        {row.trackingId}
-                      </TableCell>
-                      <TableCell className="dark:text-white text-gray-dark text-center">
-                        {row.productName}
-                      </TableCell>
-                      <TableCell className="dark:text-white text-gray-dark text-center">
-                        {row.city}
-                      </TableCell>
-                      <TableCell className="dark:text-white text-gray-dark text-center">
-                        {row.remainingStock}
-                      </TableCell>
-                    </TableRow>
-                  ))
                 )}
               </TableBody>
             </Table>
           )}
         </div>
 
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-4 gap-3">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Page {currentPage} of {totalPages}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </Button>
+        {/* PAGINATION */}
+        {filtered.length > 0 && (
+          <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Page {currentPage} of {totalPages}
+            </p>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(p) => setCurrentPage(p)}
+              windowSize={3}
+            />
           </div>
-        </div>
+        )}
       </div>
     </Fragment>
   );

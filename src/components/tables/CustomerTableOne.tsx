@@ -32,28 +32,38 @@ export default function CustomerTableOne() {
 
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
+ const fetchCustomers = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.get(`${BASE_API_URL}/user/getAllCustomers`,{
+       headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        }
+    });
+
+    const fetched: CustomerRow[] = res.data.data.map((cust: any) => ({
+      name: cust.username,
+      img: cust.avatarUrl ?? cust.profileImage ?? null,
+      customerId: cust.customerId,
+      createdDate: new Date(cust.createdAt).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+      email: cust.email,
+      phonenumber: cust.phone,
+      subscription: cust.isSubscribed ? "Active" : "Inactive",
+      action: 1,
+    }));
+
+    setCustomers(fetched);
+  } catch (err) {
+    console.error("Error fetching customers:", err);
+  }
+};
   useEffect(() => {
-    axios
-      .get(`${BASE_API_URL}/user/getAllCustomers`)
-      .then((res) => {
-        const fetched: CustomerRow[] = res.data.data.map((cust: any) => ({
-          name: cust.username,
-          img: cust.avatarUrl ?? cust.profileImage ?? null,
-          customerId: cust.customerId, // make sure this is the Auth _id if delete uses that
-          createdDate: new Date(cust.createdAt).toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          }),
-          email: cust.email,
-          phonenumber: cust.phone,
-          subscription: cust.isSubscribed ? "Active" : "Inactive",
-          action: 1,
-        }));
-        setCustomers(fetched);
-      })
-      .catch((err) => console.error("Error fetching customers:", err));
-  }, [BASE_API_URL]);
+    fetchCustomers();
+  }, []);
 
   const handleDelete = async (id: string) => {
     try {

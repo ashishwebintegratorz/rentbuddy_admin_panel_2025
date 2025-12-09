@@ -66,7 +66,10 @@ export default function InvoiceTableOne() {
     setError("");
     try {
       const res = await axios.get(
-        `${BASE_API_URL}/orders/getInvoice?page=${page}&limit=${limit}`
+        `${BASE_API_URL}/orders/getInvoice?page=${page}&limit=${limit}`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        } }
       );
 
       const data = res.data?.invoices ?? [];

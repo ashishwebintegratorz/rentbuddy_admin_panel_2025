@@ -48,33 +48,46 @@ export default function OrderTableOne() {
 
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
-  useEffect(() => {
-    axios
-      .get(`${BASE_API_URL}/orders/getOrders`)
-      .then((res) => {
-        const fetched = res.data.data.map((order: any) => ({
-          orderId: order.orderId,
-          customerName: order.userId?.username || "Unknown",
-          email: order.userId?.email || "N/A",
-          amount: order.totalAmount,
-          status: order.status || "Pending",
-          paymentType: order.paymentType || "N/A",
-          createdDate: new Date(order.createdAt).toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          }),
-        }));
-        setOrders(fetched);
-      })
-      .catch((err) => console.error("Error fetching orders:", err));
-  }, [BASE_API_URL]);
+  const fetchOrders = async () => {
+  try {
+    const res = await axios.get(`${BASE_API_URL}/orders/getOrders`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    }});
+
+    const fetched = res.data.data.map((order: any) => ({
+      orderId: order.orderId,
+      customerName: order.userId?.username || "Unknown",
+      email: order.userId?.email || "N/A",
+      amount: order.totalAmount,
+      status: order.status || "Pending",
+      paymentType: order.paymentType || "N/A",
+      createdDate: new Date(order.createdAt).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+    }));
+
+    setOrders(fetched);
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+  }
+};
+
+useEffect(() => {
+  fetchOrders();
+}, [BASE_API_URL]);
+
 
   // API call to delete
   const handleDelete = async (id: string) => {
     try {
       setIsDeleting(true);
-      await axios.delete(`${BASE_API_URL}/orders/${id}`);
+      await axios.delete(`${BASE_API_URL}/orders/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      }});
       setOrders((prev) => prev.filter((order) => order.orderId !== id));
     } catch (err) {
       console.error("Delete failed:", err);

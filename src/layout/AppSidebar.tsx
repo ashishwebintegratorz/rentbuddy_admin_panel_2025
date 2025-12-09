@@ -27,7 +27,7 @@ const navItems: NavItem[] = [
     name: "Dashboard",
     icon: <GridIcon />,
     path: "/",
-    allowedRoles: ["admin", "customer manager", "order manager", "Finance manager", "product manager"]
+    allowedRoles: ["admin", "customer manager", "order manager", "finance manager", "product manager"]
   },
 
   {
@@ -73,9 +73,9 @@ const navItems: NavItem[] = [
     icon: <PaymentIcon />,
     allowedRoles: ["admin", "finance manager"],
     subItems: [
-      { name: "Payments", path: "/payments", allowedRoles: ["admin", "Finance manager"] },
-      { name: "Invoice", path: "/invoice", allowedRoles: ["admin", "Finance manager"] },
-      { name: "Documents", path: "/documents", allowedRoles: ["admin", "Finance manager"] },
+      { name: "Payments", path: "/payments", allowedRoles: ["admin", "finance manager"] },
+      { name: "Invoice", path: "/invoice", allowedRoles: ["admin", "finance manager"] },
+      { name: "Documents", path: "/documents", allowedRoles: ["admin", "finance manager"] },
     ],
   },
 ];

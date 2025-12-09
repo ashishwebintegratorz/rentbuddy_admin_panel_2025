@@ -1,8 +1,13 @@
 import React from 'react'
+import SubscriptionTable from '../../components/tables/SubscriptionTableOne'
 
-const Subscription = () => {
+type Props = {}
+
+const Subscription = (props: Props) => {
   return (
-    <div>Subscription</div>
+    <div>
+      <SubscriptionTable/>
+    </div>
   )
 }
 
