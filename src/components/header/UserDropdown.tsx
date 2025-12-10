@@ -1,40 +1,57 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router"; // or "react-router-dom" if you're using that
 import axios from "axios";
+import { LogOut } from "lucide-react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
+
+type User = {
+  username?: string;
+  email?: string;
+  avatar?: string;
+};
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
-  const BaseUrl = import.meta.env.VITE_BASE_API_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_API_URL as string;
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    if (storedUser) {
+      try {
+        const parsed: User = JSON.parse(storedUser);
+        setUser(parsed);
+      } catch (error) {
+        console.error("Failed to parse user from localStorage", error);
+      }
+    }
   }, []);
 
-  function toggleDropdown() {
-    setIsOpen(!isOpen);
-  }
+  const toggleDropdown = () => {
+    setIsOpen((prev) => !prev);
+  };
 
-  function closeDropdown() {
+  const closeDropdown = () => {
     setIsOpen(false);
-  }
+  };
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     try {
-      // If you don't have logout route remove this axios part
+      // If you don't have logout route, this will just fall through
       await axios.post(
-        `${BaseUrl}/auth/logout`,
+        `${BASE_URL}/auth/logout`,
         {},
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
-    } catch (err) {
-      console.log("Logout API not found, clearing session manually.");
+    } catch (error) {
+      console.log("Logout API not found, clearing session manually.", error);
     }
 
-    // Clear session always
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
@@ -44,23 +61,24 @@ export default function UserDropdown() {
   return (
     <div className="relative">
       <button
+        type="button"
         onClick={toggleDropdown}
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
-
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
+        <span className="mr-3 h-11 w-11 overflow-hidden rounded-full">
           <img
             src={user?.avatar || "/images/user/user-06.jpg"}
-            alt="User"
+            alt="User avatar"
+            className="h-full w-full object-cover"
           />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">
+        <span className="mr-1 block font-medium text-theme-sm">
           {user?.username || "User"}
         </span>
 
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
+          className={`transition-transform duration-200 stroke-gray-500 dark:stroke-gray-400 ${
             isOpen ? "rotate-180" : ""
           }`}
           width="18"
@@ -84,7 +102,7 @@ export default function UserDropdown() {
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
         <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
+          <span className="block font-medium text-theme-sm text-gray-700 dark:text-gray-400">
             {user?.username || "No Name"}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
@@ -92,26 +110,15 @@ export default function UserDropdown() {
           </span>
         </div>
 
-        <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800"></ul>
+        <ul className="flex flex-col gap-1 border-b border-gray-200 pb-3 pt-4 dark:border-gray-800" />
 
         <button
+          type="button"
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
+          className="mt-3 flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5"
         >
-          <svg
-            className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M15.1007 19.247C14.6865 19.247 14.3507 18.9112..."
-            />
-          </svg>
-          Sign out
+          <LogOut className="h-5 w-5 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300" />
+          <span>Sign out</span>
         </button>
       </Dropdown>
     </div>

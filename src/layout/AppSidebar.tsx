@@ -202,7 +202,7 @@ const AppSidebar: React.FC = () => {
       <div className={`flex py-8 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link to="/">
           {(isExpanded || isHovered || isMobileOpen)
-            ? <h1 className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-transparent bg-clip-text text-2xl font-bold tracking-[0.18em]">RENTBUDDY</h1>
+            ? <h1 className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-transparent dark:text-white bg-clip-text text-2xl font-bold tracking-[0.18em]">RENTBUDDY</h1>
             : <h1 className="text-2xl font-bold tracking-[0.18em] text-slate-900 dark:text-slate-50 text-center">RB</h1>}
         </Link>
       </div>
