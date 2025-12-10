@@ -24,6 +24,10 @@ import RentalHistoryTable from "./pages/Tables/RentHistoryTable";
 import InvoiceDetail from "./components/tables/InvoiceDetail";
 import ProtectedRoute from "./components/protected/ProtectedRoutes";
 import Defaulters from "./pages/Tables/Defaulters";
+import CustomersDashboard from "./pages/Dashboard/CustomersDashboard";
+import OrdersDashboard from "./pages/Dashboard/OrdersDashboard";
+import ProductsDashboard from "./pages/Dashboard/ProductsDashboard";
+import BillingDashboard from "./pages/Dashboard/BillingDashboard";
 
 export default function App() {
   return (
@@ -46,6 +50,38 @@ export default function App() {
                   ]}
                 >
                   <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customers-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "customer manager"]}>
+                  <CustomersDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "Order manager"]}>
+                  <OrdersDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/products-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "Product manager"]}>
+                  <ProductsDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/billing-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "Finance manager"]}>
+                  <BillingDashboard />
                 </ProtectedRoute>
               }
             />
