@@ -424,12 +424,12 @@ function MetricCard({ icon, title, value, badge }: MetricCardProps) {
         </span>
       </div>
 
-      <div className="mt-4 flex items-end justify-between gap-3">
-        <div className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+      <div className="mt-4 flex-col items-center  gap-6">
+        <div className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 mb-4">
           {value}
         </div>
 
-        {badge && <div className="flex-shrink-0 text-[11px]">{badge}</div>}
+        {badge && <div className=" text-[10px] ">{badge}</div>}
       </div>
     </div>
   );
