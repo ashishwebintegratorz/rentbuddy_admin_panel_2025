@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 import Badge from "../../components/ui/badge/Badge";
-import { ArrowUpIcon, ArrowDownIcon, GroupIcon, BoxIconLine } from "../../icons";
+import { ArrowUpIcon, GroupIcon, BoxIconLine } from "../../icons";
 
 /* ---------------- Import ORDER charts ---------------- */
 import {

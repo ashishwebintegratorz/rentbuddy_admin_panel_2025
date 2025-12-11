@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Table,
@@ -61,10 +61,10 @@ export default function SubscriptionTable() {
 
           const nextChargeDate = sub.nextChargeAt
             ? new Date(sub.nextChargeAt).toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
             : "—";
 
           const remainingLabel =
@@ -215,9 +215,8 @@ export default function SubscriptionTable() {
               >
                 <span>{statusLabelMap[statusFilter]}</span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    isStatusDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`h-4 w-4 transition-transform ${isStatusDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 

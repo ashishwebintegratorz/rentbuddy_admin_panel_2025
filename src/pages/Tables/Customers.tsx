@@ -1,4 +1,3 @@
-import React from "react";
 import CustomerTableOne from "../../components/tables/CustomerTableOne";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 

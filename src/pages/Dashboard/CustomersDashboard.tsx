@@ -1,8 +1,6 @@
-import React from 'react'
 
-type Props = {}
 
-const CustomersDashboard = (props: Props) => {
+const CustomersDashboard = () => {
   return (
     <div>CustomersDashboard</div>
   )

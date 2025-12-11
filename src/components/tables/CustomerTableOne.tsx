@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Table,
@@ -27,40 +27,40 @@ export default function CustomerTableOne() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmId, setConfirmId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting] = useState(false);
   const customersPerPage = 10;
 
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
- const fetchCustomers = async () => {
-  const token = localStorage.getItem("token");
-  try {
-    const res = await axios.get(`${BASE_API_URL}/user/getAllCustomers`,{
-       headers: {
+  const fetchCustomers = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(`${BASE_API_URL}/user/getAllCustomers`, {
+        headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         }
-    });
+      });
 
-    const fetched: CustomerRow[] = res.data.data.map((cust: any) => ({
-      name: cust.username,
-      img: cust.avatarUrl ?? cust.profileImage ?? null,
-      customerId: cust.customerId,
-      createdDate: new Date(cust.createdAt).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-      email: cust.email,
-      phonenumber: cust.phone,
-      subscription: cust.isSubscribed ? "Active" : "Inactive",
-      action: 1,
-    }));
+      const fetched: CustomerRow[] = res.data.data.map((cust: any) => ({
+        name: cust.username,
+        img: cust.avatarUrl ?? cust.profileImage ?? null,
+        customerId: cust.customerId,
+        createdDate: new Date(cust.createdAt).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+        email: cust.email,
+        phonenumber: cust.phone,
+        subscription: cust.isSubscribed ? "Active" : "Inactive",
+        action: 1,
+      }));
 
-    setCustomers(fetched);
-  } catch (err) {
-    console.error("Error fetching customers:", err);
-  }
-};
+      setCustomers(fetched);
+    } catch (err) {
+      console.error("Error fetching customers:", err);
+    }
+  };
   useEffect(() => {
     fetchCustomers();
   }, []);
@@ -196,7 +196,7 @@ export default function CustomerTableOne() {
                               <span className="absolute -right-1 -bottom-1 h-3 w-3 rounded-full bg-rose-400 shadow-[0_0_0_3px_rgba(248,250,252,0.9)] dark:shadow-[0_0_0_3px_rgba(15,23,42,1)]" />
                             )
                           }
-                          
+
                         </div>
                         <div className="flex flex-col">
                           <span className="font-medium text-slate-900 dark:text-slate-50">
@@ -231,18 +231,16 @@ export default function CustomerTableOne() {
 
                     <TableCell className="px-4 py-4 text-sm text-slate-700 dark:text-slate-300">
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ring-1 ring-inset ${
-                          cust.subscription === "Active"
-                            ? "bg-emerald-500/10 text-emerald-400 ring-emerald-500/40 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]"
-                            : "bg-rose-500/10 text-rose-400 ring-rose-500/40 shadow-[0_0_0_1px_rgba(244,63,94,0.35)]"
-                        }`}
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ring-1 ring-inset ${cust.subscription === "Active"
+                          ? "bg-emerald-500/10 text-emerald-400 ring-emerald-500/40 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]"
+                          : "bg-rose-500/10 text-rose-400 ring-rose-500/40 shadow-[0_0_0_1px_rgba(244,63,94,0.35)]"
+                          }`}
                       >
                         <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            cust.subscription === "Active"
-                              ? "bg-emerald-400"
-                              : "bg-rose-400"
-                          }`}
+                          className={`h-1.5 w-1.5 rounded-full ${cust.subscription === "Active"
+                            ? "bg-emerald-400"
+                            : "bg-rose-400"
+                            }`}
                         />
                         {cust.subscription}
                       </span>

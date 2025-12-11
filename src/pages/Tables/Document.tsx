@@ -1,4 +1,3 @@
-import React from "react";
 import DocumentTableOne from "../../components/tables/DocumentTableOne";
 
 const Document = () => {

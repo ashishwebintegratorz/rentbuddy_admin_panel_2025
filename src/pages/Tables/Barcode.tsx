@@ -1,4 +1,3 @@
-import React from "react";
 import BarcodeTableOne from "../../components/tables/BarcodeTableOne";
 
 const Barcode = () => {

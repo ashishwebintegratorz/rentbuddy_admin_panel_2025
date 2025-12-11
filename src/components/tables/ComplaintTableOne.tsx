@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Table,
@@ -138,11 +138,10 @@ const ComplaintTableOne = () => {
 
   return (
     <>
-   
+
       <div
-        className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col table-scrollbar ${
-          isExpanded ? "max-w-40% xl:max-w-220 axl:max-w-270" : "max-w-340 xl:max-w-330 2xl:max-w-70%"
-        }`}
+        className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col table-scrollbar ${isExpanded ? "max-w-40% xl:max-w-220 axl:max-w-270" : "max-w-340 xl:max-w-330 2xl:max-w-70%"
+          }`}
       >
         {/* Table scroll wrapper */}
         <div
@@ -342,7 +341,7 @@ const ComplaintTableOne = () => {
           </div>
         </div>
       </div>
-    
+
 
       {/* Edit Modal */}
       {openModal.type === "edit" && openModal.complaint && (
@@ -398,10 +397,10 @@ const ComplaintTableOne = () => {
               Delete
             </Button>
           </div>
-          
+
         </ModalWrapper>
       )}
-      
+
     </>
   );
 };

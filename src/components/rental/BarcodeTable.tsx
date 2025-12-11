@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useSidebar } from "../../context/SidebarContext";
 import type { BarcodeRecord } from "../tables/RentalStockPage";
 
 interface Props {
@@ -17,15 +16,13 @@ interface Props {
 const formatDate = (d?: string) =>
   d
     ? new Date(d).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
     : "-";
 
 const BarcodeTable: React.FC<Props> = ({ barcodes, onSelectBarcode }) => {
-  const { isExpanded } = useSidebar(); // still available if you adjust layout later
-
   return (
     <div className="max-w-full overflow-x-auto rounded-xl border border-white/20 bg-white/30 shadow-[0_18px_40px_rgba(15,23,42,0.28)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/40 table-scrollbar">
       <Table className="min-w-[950px]">

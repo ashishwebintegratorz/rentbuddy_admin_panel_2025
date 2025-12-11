@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Table,
@@ -49,45 +49,47 @@ export default function OrderTableOne() {
   const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
   const fetchOrders = async () => {
-  try {
-    const res = await axios.get(`${BASE_API_URL}/orders/getOrders`,{
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-    }});
+    try {
+      const res = await axios.get(`${BASE_API_URL}/orders/getOrders`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        }
+      });
 
-    const fetched = res.data.data.map((order: any) => ({
-      orderId: order.orderId,
-      customerName: order.userId?.username || "Unknown",
-      email: order.userId?.email || "N/A",
-      amount: order.totalAmount,
-      status: order.status || "Pending",
-      paymentType: order.paymentType || "N/A",
-      createdDate: new Date(order.createdAt).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-    }));
+      const fetched = res.data.data.map((order: any) => ({
+        orderId: order.orderId,
+        customerName: order.userId?.username || "Unknown",
+        email: order.userId?.email || "N/A",
+        amount: order.totalAmount,
+        status: order.status || "Pending",
+        paymentType: order.paymentType || "N/A",
+        createdDate: new Date(order.createdAt).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+      }));
 
-    setOrders(fetched);
-  } catch (err) {
-    console.error("Error fetching orders:", err);
-  }
-};
+      setOrders(fetched);
+    } catch (err) {
+      console.error("Error fetching orders:", err);
+    }
+  };
 
-useEffect(() => {
-  fetchOrders();
-}, [BASE_API_URL]);
+  useEffect(() => {
+    fetchOrders();
+  }, [BASE_API_URL]);
 
 
   // API call to delete
   const handleDelete = async (id: string) => {
     try {
       setIsDeleting(true);
-      await axios.delete(`${BASE_API_URL}/orders/${id}`,{
+      await axios.delete(`${BASE_API_URL}/orders/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-      }});
+        }
+      });
       setOrders((prev) => prev.filter((order) => order.orderId !== id));
     } catch (err) {
       console.error("Delete failed:", err);
@@ -215,9 +217,8 @@ useEffect(() => {
               >
                 <span>{statusLabelMap[statusFilter]}</span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    isStatusDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`h-4 w-4 transition-transform ${isStatusDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 
@@ -262,9 +263,8 @@ useEffect(() => {
               >
                 <span>{paymentLabelMap[paymentFilter]}</span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    isPaymentDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`h-4 w-4 transition-transform ${isPaymentDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
               </button>
               <Dropdown
@@ -365,22 +365,20 @@ useEffect(() => {
 
                     <TableCell className="px-4 py-4 text-sm">
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ring-1 ring-inset ${
-                          order.status.toLowerCase() === "completed"
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ring-1 ring-inset ${order.status.toLowerCase() === "completed"
                             ? "bg-emerald-500/10 text-emerald-400 ring-emerald-500/40 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]"
                             : order.status.toLowerCase() === "pending"
-                            ? "bg-amber-500/10 text-amber-400 ring-amber-500/40 shadow-[0_0_0_1px_rgba(245,158,11,0.35)]"
-                            : "bg-slate-500/10 text-slate-300 ring-slate-500/40 shadow-[0_0_0_1px_rgba(148,163,184,0.35)]"
-                        }`}
+                              ? "bg-amber-500/10 text-amber-400 ring-amber-500/40 shadow-[0_0_0_1px_rgba(245,158,11,0.35)]"
+                              : "bg-slate-500/10 text-slate-300 ring-slate-500/40 shadow-[0_0_0_1px_rgba(148,163,184,0.35)]"
+                          }`}
                       >
                         <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            order.status.toLowerCase() === "completed"
+                          className={`h-1.5 w-1.5 rounded-full ${order.status.toLowerCase() === "completed"
                               ? "bg-emerald-400"
                               : order.status.toLowerCase() === "pending"
-                              ? "bg-amber-400"
-                              : "bg-slate-400"
-                          }`}
+                                ? "bg-amber-400"
+                                : "bg-slate-400"
+                            }`}
                         />
                         {order.status}
                       </span>
