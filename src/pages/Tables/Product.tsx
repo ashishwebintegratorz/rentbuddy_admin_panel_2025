@@ -1,4 +1,3 @@
-import React from "react";
 import ProductTableOne from "../../components/tables/ProductTableOne";
 
 const Product = () => {

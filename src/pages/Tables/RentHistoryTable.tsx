@@ -1,11 +1,9 @@
-import React from 'react'
 import RentalStockPage from '../../components/tables/RentalStockPage'
-type Props = {}
 
-const RentHistoryTable = (props: Props) => {
+const RentHistoryTable = () => {
   return (
     <div>
-        <RentalStockPage/>
+      <RentalStockPage />
     </div>
   )
 }

@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { VectorMap } from "@react-jvectormap/core";
 import { inMill } from "@react-jvectormap/india";
 
-// State coordinates mapping
+/** Normalized coordinates keyed by lowercase single-space state names */
 const stateCoordinates: Record<string, [number, number]> = {
   gujarat: [22.2587, 71.1924],
   "madhya pradesh": [22.9734, 78.6569],
@@ -11,10 +11,10 @@ const stateCoordinates: Record<string, [number, number]> = {
   "uttar pradesh": [26.8467, 80.9462],
   karnataka: [15.3173, 75.7139],
   "tamil nadu": [11.1271, 78.6569],
-  "andhra pradesh": [15.9129, 79.7400],
+  "andhra pradesh": [15.9129, 79.74],
   telangana: [18.1124, 79.0193],
   kerala: [10.8505, 76.2711],
-  "west bengal": [22.9868, 87.8550],
+  "west bengal": [22.9868, 87.855],
   punjab: [31.1471, 75.3412],
   haryana: [29.0588, 76.0856],
   bihar: [25.0961, 85.3131],
@@ -24,13 +24,11 @@ const stateCoordinates: Record<string, [number, number]> = {
   jharkhand: [23.6102, 85.2799],
   chhattisgarh: [21.2787, 81.8661],
   assam: [26.2006, 92.9376],
-  goa: [15.2993, 74.1240],
+  goa: [15.2993, 74.124],
 };
 
-// Normalize state name
-const normalizeStateName = (name: string): string => {
-  return name.toLowerCase().trim().replace(/\s+/g, " ");
-};
+const normalizeStateName = (name: string): string =>
+  name.toLowerCase().trim().replace(/\s+/g, " ");
 
 interface OrderData {
   name: string;
@@ -39,45 +37,79 @@ interface OrderData {
   totalAmount: number;
 }
 
+type AggregatedData = Record<
+  string,
+  {
+    name: string;
+    ordersCount: number;
+    totalProducts: number;
+    totalAmount: number;
+  }
+>;
+
 interface CountryMapProps {
   mapColor?: string;
 }
+
+/**
+ * Read the base API URL from Vite env; fallback to localhost if missing.
+ * The import.meta.env type is declared in src/env.d.ts (see file added below).
+ */
+const BASE_API_URL = import.meta.env.VITE_BASE_API_URL ?? "http://localhost:4000";
 
 const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
   const [ordersData, setOrdersData] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
+    const fetchOrdersData = async () => {
+      try {
+        const url = `${BASE_API_URL.replace(/\/$/, "")}/api/orders/orders-by-state`;
+        const res = await fetch(url);
+
+        if (!res.ok) {
+          console.error("Network response not ok:", res.statusText);
+          return;
+        }
+
+        const parsed = (await res.json()) as
+          | { success?: boolean; data?: OrderData[] }
+          | OrderData[]
+          | null;
+
+        if (!mounted) return;
+
+        if (Array.isArray(parsed)) {
+          setOrdersData(parsed as OrderData[]);
+        } else if (parsed && parsed.success && Array.isArray(parsed.data)) {
+          setOrdersData(parsed.data);
+        } else {
+          setOrdersData([]);
+        }
+      } catch (err) {
+        console.error("Error fetching orders data:", err);
+        if (mounted) setOrdersData([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
     fetchOrdersData();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const fetchOrdersData = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:4000/api/orders/orders-by-state"
-      );
-      const result = await response.json();
-      if (result.success) {
-        setOrdersData(result.data);
-      }
-    } catch (error) {
-      console.error("Error fetching orders data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const aggregatedData: AggregatedData = ordersData.reduce((acc, item) => {
+    if (!item?.name) return acc;
+    const normalized = normalizeStateName(item.name);
+    const skip = new Set(["state", "india", "mp", "n/a", "null"]);
+    if (skip.has(normalized)) return acc;
 
-  // Aggregate orders by state (handling duplicates and variations)
-  const aggregatedData = ordersData.reduce((acc, item) => {
-    const normalizedName = normalizeStateName(item.name);
-    
-    // Skip invalid state names
-    if (normalizedName === "state" || normalizedName === "india" || normalizedName === "mp") {
-      return acc;
-    }
-
-    if (!acc[normalizedName]) {
-      acc[normalizedName] = {
+    if (!acc[normalized]) {
+      acc[normalized] = {
         name: item.name,
         ordersCount: 0,
         totalProducts: 0,
@@ -85,29 +117,40 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
       };
     }
 
-    acc[normalizedName].ordersCount += item.ordersCount;
-    acc[normalizedName].totalProducts += item.totalProducts;
-    acc[normalizedName].totalAmount += item.totalAmount;
+    acc[normalized].ordersCount += Number(item.ordersCount) || 0;
+    acc[normalized].totalProducts += Number(item.totalProducts) || 0;
+    acc[normalized].totalAmount += Number(item.totalAmount) || 0;
 
     return acc;
-  }, {} as Record<string, OrderData>);
+  }, {} as AggregatedData);
 
-  // Convert to markers
+  type Marker = {
+    latLng: [number, number];
+    name: string;
+    style: {
+      fill: string;
+      r: number;
+    };
+  };
+
   const markers = Object.entries(aggregatedData)
     .map(([key, data]) => {
       const coords = stateCoordinates[key];
       if (!coords) return null;
-
+      const orders = data.ordersCount ?? 0;
+      const size = Math.max(4, Math.min(Math.round(orders / 5), 15));
       return {
         latLng: coords,
-        name: `${data.name}\nOrders: ${data.ordersCount}\nProducts: ${data.totalProducts}\nAmount: ₹${data.totalAmount.toFixed(2)}`,
+        name: `${data.name}\nOrders: ${orders}\nProducts: ${
+          data.totalProducts ?? 0
+        }\nAmount: ₹${(data.totalAmount ?? 0).toFixed(2)}`,
         style: {
-          fill: "#465FFF",
-          r: Math.max(4, Math.min(data.ordersCount / 5, 15)), // Dynamic marker size
+          fill: mapColor ?? "#465FFF",
+          r: size,
         },
-      };
+      } as Marker;
     })
-    .filter(Boolean) as any[];
+    .filter((m): m is Marker => m !== null);
 
   if (loading) {
     return (
@@ -119,38 +162,33 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
 
   return (
     <div className="h-full relative z-10">
-      <style>
-        {`
-          .jvectormap-tip {
-            z-index: 100 !important;
-          }
-        `}
-      </style>
+      <style>{`.jvectormap-tip { z-index: 100 !important; }`}</style>
+
+      {/* Keep VectorMap typing intact by casting just the props object to the component's props type */}
       <VectorMap
-        map={inMill}
-        backgroundColor="transparent"
-        containerStyle={{
-          width: "100%",
-          height: "100%",
-        }}
-        containerClassName="relative z-10"
-        markerStyle={{
-          initial: {
-            fill: "#465FFF",
-            stroke: "#ffffff",
-            "stroke-width": 2,
-            "stroke-opacity": 1,
-            r: 6,
+        {...(({
+          map: inMill,
+          backgroundColor: "transparent",
+          containerStyle: { width: "100%", height: "100%" },
+          containerClassName: "relative z-10",
+          markerStyle: {
+            initial: {
+              fill: mapColor ?? "#465FFF",
+              stroke: "#ffffff",
+              strokeWidth: 2,
+              strokeOpacity: 1,
+              r: 6,
+            },
+            hover: {
+              fill: "#2E47D9",
+              cursor: "pointer",
+              r: 8,
+            },
           },
-          hover: {
-            fill: "#2E47D9",
-            cursor: "pointer",
-            r: 8,
-          },
-        }}
-        markers={markers}
+          markers,
+        } as unknown) as React.ComponentProps<typeof VectorMap>)}
       />
-      
+
       {/* Legend */}
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-sm font-semibold mb-2">Orders by State</h3>
@@ -160,7 +198,11 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
             .slice(0, 6)
             .map(([key, data]) => (
               <div key={key} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#465FFF]"></div>
+                <span
+                  className="w-3 h-3 rounded-full inline-block"
+                  style={{ backgroundColor: mapColor ?? "#465FFF" }}
+                  aria-hidden
+                />
                 <span className="font-medium">{data.name}:</span>
                 <span className="text-gray-600">{data.ordersCount} orders</span>
               </div>

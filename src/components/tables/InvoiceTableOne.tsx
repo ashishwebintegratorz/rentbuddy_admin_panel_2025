@@ -1,5 +1,5 @@
 // src/components/tables/InvoiceTableOne.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Table,
@@ -66,10 +66,11 @@ export default function InvoiceTableOne() {
     setError("");
     try {
       const res = await axios.get(
-        `${BASE_API_URL}/orders/getInvoice?page=${page}&limit=${limit}`,{
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-        } }
+        `${BASE_API_URL}/orders/getInvoice?page=${page}&limit=${limit}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        }
+      }
       );
 
       const data = res.data?.invoices ?? [];
@@ -88,10 +89,10 @@ export default function InvoiceTableOne() {
 
         const createdDate = inv.created_at
           ? new Date(inv.created_at).toLocaleDateString("en-IN", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })
           : "";
 
         const subscriptionStatus = inv.subscriptionDate ? "Active" : "Inactive";
@@ -207,9 +208,8 @@ export default function InvoiceTableOne() {
               >
                 <span>{paymentLabelMap[paymentFilter]}</span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    isPaymentDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`h-4 w-4 transition-transform ${isPaymentDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 
@@ -377,18 +377,16 @@ export default function InvoiceTableOne() {
                     {/* Subscription pill */}
                     <TableCell className="px-4 py-4 text-sm text-slate-700 dark:text-slate-300">
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ring-1 ring-inset ${
-                          inv.subscription === "Active"
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ring-1 ring-inset ${inv.subscription === "Active"
                             ? "bg-emerald-500/10 text-emerald-400 ring-emerald-500/40 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]"
                             : "bg-rose-500/10 text-rose-400 ring-rose-500/40 shadow-[0_0_0_1px_rgba(244,63,94,0.35)]"
-                        }`}
+                          }`}
                       >
                         <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            inv.subscription === "Active"
+                          className={`h-1.5 w-1.5 rounded-full ${inv.subscription === "Active"
                               ? "bg-emerald-400"
                               : "bg-rose-400"
-                          }`}
+                            }`}
                         />
                         {inv.subscription}
                       </span>

@@ -17,10 +17,10 @@ interface Props {
 const formatDate = (d?: string) =>
   d
     ? new Date(d).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
     : "-";
 
 const BarcodeTable: React.FC<Props> = ({ barcodes, onSelectBarcode }) => {

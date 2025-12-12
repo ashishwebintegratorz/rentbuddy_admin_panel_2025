@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -30,9 +30,6 @@ interface RepairProduct {
 const itemsPerPage = 10;
 
 const RepairTableOne: React.FC = () => {
-  // BEFORE
-  const { toggleSidebar } = useSidebar();
-
   // AFTER
   const { isExpanded } = useSidebar();
 
@@ -40,8 +37,6 @@ const RepairTableOne: React.FC = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [menuOpen, setMenuOpen] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const [modal, setModal] = useState<{
     open: boolean;
@@ -184,22 +179,13 @@ const RepairTableOne: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const handler = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setMenuOpen(null);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+
 
   return (
     <>
       <div
-        className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col ${
-          isExpanded ? "max-w-40% xl:max-w-235 axl:max-w-250 bxl:max-w-263 cxl:max-w-280" : "max-w-340 xl:max-w-280 axl:max-w-300 cxl:max-w-330 2xl:max-w-320"
-        }`}
+        className={`rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] transition-[max-width] duration-300 ease-in-out p-5 flex flex-col ${isExpanded ? "max-w-40% xl:max-w-235 axl:max-w-250 bxl:max-w-263 cxl:max-w-280" : "max-w-340 xl:max-w-280 axl:max-w-300 cxl:max-w-330 2xl:max-w-320"
+          }`}
       >
         {/* Controls Row (never scrolls in X) */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 overflow-x-auto scrollbar-hide table-scrollbar">
@@ -265,9 +251,8 @@ const RepairTableOne: React.FC = () => {
                     <TableCell
                       key={label}
                       isHeader
-                      className={`px-5 py-3 dark:text-white text-gray-dark min-w-[${width}px] ${
-                        label === "Actions" ? "text-center" : ""
-                      }`}
+                      className={`px-5 py-3 dark:text-white text-gray-dark min-w-[${width}px] ${label === "Actions" ? "text-center" : ""
+                        }`}
                     >
                       {label}
                     </TableCell>

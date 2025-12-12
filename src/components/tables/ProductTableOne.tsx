@@ -34,8 +34,8 @@ function EditProductForm({
   onChange: (
     e:
       | React.ChangeEvent<
-          HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-        >
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >
       | { target: { name: string; value: string } }
   ) => void;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -107,9 +107,8 @@ function EditProductForm({
             >
               <span>{categoryLabel}</span>
               <ChevronDown
-                className={`w-4 h-4 transition-transform ${
-                  isCategoryOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transition-transform ${isCategoryOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -522,8 +521,8 @@ export default function ProductTableOne() {
   const handleNewProductChange = (
     e:
       | React.ChangeEvent<
-          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >
       | { target: { name: string; value: string } }
   ) => {
     const { name, value } = e.target;
@@ -547,8 +546,7 @@ export default function ProductTableOne() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        `${BASE_API_URL}/products/getProduct?page=${page}&limit=${limit}${
-          city ? `&city=${city}` : ""
+        `${BASE_API_URL}/products/getProduct?page=${page}&limit=${limit}${city ? `&city=${city}` : ""
         }`,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -640,9 +638,11 @@ export default function ProductTableOne() {
   };
 
   const handleEditProductChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e:
+      | React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >
+      | { target: { name: string; value: string } }
   ) => {
     const { name, value } = e.target;
     setEditProduct((prev: any) => ({ ...prev, [name]: value }));
@@ -782,8 +782,8 @@ export default function ProductTableOne() {
               key === "stocks"
                 ? "stock" // backend uses stock
                 : key === "image"
-                ? "productImage" // backend multer expects productImage
-                : key;
+                  ? "productImage" // backend multer expects productImage
+                  : key;
 
             if (value instanceof File) {
               formData.append(formKey, value);
@@ -1133,7 +1133,7 @@ export default function ProductTableOne() {
       </div>
 
       {/* Pagination */}
-      
+
       {products.length > 0 && (
         <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-gray-600 dark:text-gray-300">

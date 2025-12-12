@@ -1,6 +1,13 @@
 import ReactDOM from "react-dom";
+import { ReactNode } from "react";
 
-function ModalWrapper({ isOpen, onClose, children }) {
+interface ModalWrapperProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children: ReactNode;
+}
+
+function ModalWrapper({ isOpen, onClose, children }: ModalWrapperProps) {
   if (!isOpen) return null;
   return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-[100000]">

@@ -1,4 +1,3 @@
-import React from "react";
 import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 
@@ -67,6 +66,7 @@ export function RevenueByMonthChart({ data }: { data: MonthlyPoint[] }) {
       toolbar: { show: false },
       foreColor: "#64748b",
       animations: { enabled: true },
+      background: "transparent", // ✅ match order charts
     },
     theme: { mode: "light" },
     plotOptions: {
@@ -129,7 +129,13 @@ export function RevenueByProductChart({ data }: { data: ProductRevenue[] }) {
 
   const options: ApexOptions = {
     colors: ["#10b981"],
-    chart: { type: "bar", height: 260, toolbar: { show: false }, foreColor: "#64748b" },
+    chart: {
+      type: "bar",
+      height: 260,
+      toolbar: { show: false },
+      foreColor: "#64748b",
+      background: "transparent", // ✅ consistent bg
+    },
     theme: { mode: "light" },
     plotOptions: {
       bar: {
@@ -186,11 +192,18 @@ export function RevenueByProductChart({ data }: { data: ProductRevenue[] }) {
 
 const donutColors = ["#4f46e5", "#22c55e", "#f97316", "#f43f5e", "#0ea5e9"];
 
-function buildDonutOptions(labels: string[], tooltipFormatter: (val: number) => string): ApexOptions {
+function buildDonutOptions(
+  labels: string[],
+  tooltipFormatter: (val: number) => string
+): ApexOptions {
   return {
     labels,
     colors: donutColors,
-    chart: { type: "donut", foreColor: "#0f172a" },
+    chart: {
+      type: "donut",
+      foreColor: "#0f172a",
+      background: "transparent", // ✅ same glass-card look
+    },
     theme: { mode: "light" },
     legend: { position: "bottom" },
     dataLabels: { enabled: false },
@@ -200,7 +213,8 @@ function buildDonutOptions(labels: string[], tooltipFormatter: (val: number) => 
       fillSeriesColor: false,
       style: {
         fontSize: "12px",
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif",
+        fontFamily:
+          "system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif",
       },
       y: {
         formatter: tooltipFormatter,

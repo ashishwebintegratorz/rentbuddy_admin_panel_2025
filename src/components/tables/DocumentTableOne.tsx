@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment } from "react";
 import axios from "axios";
 import {
   Table,
@@ -137,13 +137,13 @@ const DocumentTableOne = () => {
                   {current.length > 0 ? (
                     current.map(d => (
                       <TableRow key={d._id}>
-                        
+
                         <TableCell className="font-medium dark:text-white">{d.username}</TableCell>
 
                         {/* Eye Preview Buttons */}
                         <TableCell className="text-center">
                           {d.documents.aadhar?.url ? (
-                            <button onClick={() => setPreview(d.documents.aadhar!.url)} className="text-blue-600 hover:text-blue-700">
+                            <button onClick={() => setPreview(d.documents.aadhar?.url ?? null)} className="text-blue-600 hover:text-blue-700">
                               <Eye size={20} />
                             </button>
                           ) : "—"}
@@ -151,7 +151,7 @@ const DocumentTableOne = () => {
 
                         <TableCell className="text-center">
                           {d.documents.pan?.url ? (
-                            <button onClick={() => setPreview(d.documents.pan!.url)} className="text-blue-600 hover:text-blue-700">
+                            <button onClick={() => setPreview(d.documents.pan?.url ?? null)} className="text-blue-600 hover:text-blue-700">
                               <Eye size={20} />
                             </button>
                           ) : "—"}
@@ -159,13 +159,13 @@ const DocumentTableOne = () => {
 
                         <TableCell className="text-center">
                           {d.documents.rentAgreement?.url ? (
-                            <button onClick={() => setPreview(d.documents.rentAgreement!.url)} className="text-blue-600 hover:text-blue-700">
+                            <button onClick={() => setPreview(d.documents.rentAgreement?.url ?? null)} className="text-blue-600 hover:text-blue-700">
                               <Eye size={20} />
                             </button>
                           ) : "—"}
                         </TableCell>
 
-                        <TableCell className="text-center"><StatusBadge status={d.status}/></TableCell>
+                        <TableCell className="text-center"><StatusBadge status={d.status} /></TableCell>
 
                         {/* ACCEPT + REJECT Buttons */}
                         <TableCell className="text-center flex items-center justify-center gap-2 py-3">
@@ -205,7 +205,7 @@ const DocumentTableOne = () => {
         {filtered.length > 0 && (
           <div className="flex justify-between mt-4">
             <p className="text-sm dark:text-gray-300">Page {currentPage} of {totalPages}</p>
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage}/>
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
           </div>
         )}
       </div>

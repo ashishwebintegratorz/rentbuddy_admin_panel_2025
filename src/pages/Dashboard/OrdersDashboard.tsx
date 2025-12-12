@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 import Badge from "../../components/ui/badge/Badge";
-import { ArrowUpIcon, ArrowDownIcon, GroupIcon, BoxIconLine } from "../../icons";
+import { ArrowUpIcon, GroupIcon, BoxIconLine } from "../../icons";
 
 /* ---------------- Import ORDER charts ---------------- */
 import {
@@ -13,7 +13,7 @@ import {
   TopCustomersChart,
   RevenueByState,
   PaymentTypeChart,
-  PaymentStatusChart
+  PaymentStatusChart,
 } from "../../components/charts/OrdersCharts/OrderAnalyticsCharts";
 
 const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
@@ -48,6 +48,7 @@ export default function OrdersDashboard() {
   async function fetchAnalytics() {
     try {
       setLoading(true);
+      setError(null);
       const token = localStorage.getItem("token");
 
       const res = await axios.get(`${BASE_API_URL}/orders/analytics`, {
@@ -71,28 +72,46 @@ export default function OrdersDashboard() {
   const summary = data?.summary;
 
   /* =====================================================
-     ▪▪▪ Loading Skeleton (Same UI as Billing Dashboard) ▪▪▪
+     ▪▪▪ FULL-PAGE LOADING SKELETON (MATCHES BILLING UI) ▪▪▪
   ====================================================== */
   if (loading) {
     return (
-      <div className="w-full max-w-7xl mx-auto px-4 pb-10 pt-2 space-y-8">
-        <div className="flex justify-between border-b pb-4">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-2 lg:px-6">
+        {/* Header skeleton */}
+        <div className="flex flex-col gap-4 border-b border-slate-100 pb-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
-            <div className="h-6 w-56 bg-slate-200 rounded animate-pulse" />
-            <div className="h-4 w-72 bg-slate-200 rounded animate-pulse" />
+            <div className="h-6 w-56 rounded bg-slate-100 dark:bg-slate-800 animate-pulse" />
+            <div className="h-4 w-72 rounded bg-slate-100 dark:bg-slate-800 animate-pulse" />
           </div>
-          <div className="h-9 w-28 bg-slate-200 rounded animate-pulse" />
+          <div className="h-9 w-28 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+        {/* Top metric skeletons */}
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-[170px] rounded-xl bg-slate-200 animate-pulse" />
+            <div
+              key={i}
+              className="flex min-h-[170px] flex-col justify-between rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                <div className="h-3 w-24 rounded bg-slate-100 dark:bg-slate-800 animate-pulse" />
+              </div>
+              <div className="mt-4 h-7 w-20 rounded bg-slate-100 dark:bg-slate-800 animate-pulse" />
+            </div>
           ))}
         </div>
 
-        <div className="grid gap-6">
+        {/* Chart skeletons */}
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-1">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-[280px] rounded-xl bg-slate-200 animate-pulse" />
+            <div
+              key={i}
+              className="rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div className="mb-4 h-4 w-40 rounded bg-slate-100 dark:bg-slate-800 animate-pulse" />
+              <div className="h-48 w-full rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+            </div>
           ))}
         </div>
       </div>
@@ -100,83 +119,125 @@ export default function OrdersDashboard() {
   }
 
   /* =====================================================
-     ▪▪▪ REAL DASHBOARD UI ▪▪▪
+     ▪▪▪ REAL DASHBOARD UI (MIRRORS BILLING DASHBOARD) ▪▪▪
   ====================================================== */
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-2 lg:px-6">
-
       {/* HEADER */}
       <div className="flex flex-col gap-4 border-b border-slate-100 pb-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Order Analytics</h1>
-          <p className="text-sm text-slate-500">Sales, customer behaviour & performance tracking.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+            Order Analytics
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Sales performance, customer behaviour & order trends.
+          </p>
         </div>
 
         <button
           onClick={fetchAnalytics}
-          className="px-4 py-2 rounded-lg border text-sm shadow hover:bg-slate-100 transition"
+          disabled={false}
+          className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-800 shadow-sm transition hover:-translate-y-[1px] hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
         >
           ⟳ Refresh
         </button>
       </div>
 
-      {error && <div className="bg-red-50 text-red-600 p-3 rounded">{error}</div>}
+      {/* ERROR */}
+      {error && (
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-700 shadow-sm dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200">
+          {error}
+        </div>
+      )}
 
-      {/* ─── Summary Cards ───────────────────────────── */}
+      {/* SUMMARY CARDS */}
       {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard
-            icon={<GroupIcon className="size-6" />}
+            icon={<GroupIcon className="size-6 text-slate-800 dark:text-slate-50" />}
             title="Total Orders"
             value={summary.totalOrders}
-            badge={<Badge color="success"><ArrowUpIcon /> +{summary.monthlyOrders} this month</Badge>}
+            badge={
+              <Badge color="success">
+                <ArrowUpIcon />
+                +{summary.monthlyOrders} this month
+              </Badge>
+            }
           />
 
           <MetricCard
-            icon={<span className="text-lg font-bold text-green-600">₹</span>}
+            icon={
+              <span className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
+                ₹
+              </span>
+            }
             title="Total Revenue"
             value={`₹${summary.totalRevenue.toLocaleString("en-IN")}`}
-            badge={<Badge color="success"><ArrowUpIcon /> Revenue Growth</Badge>}
+            badge={
+              <Badge color="success">
+                <ArrowUpIcon />
+                Revenue growth
+              </Badge>
+            }
           />
 
           <MetricCard
-            icon={<span className="text-lg font-bold text-indigo-500">Σ</span>}
+            icon={
+              <span className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">
+                Σ
+              </span>
+            }
             title="Avg Order Value"
-            value={`₹${summary.avgOrderValue}`}
-            badge={<Badge color="success">Good AOV</Badge>}
+            value={`₹${summary.avgOrderValue.toLocaleString("en-IN", {
+              maximumFractionDigits: 0,
+            })}`}
+            badge={<Badge color="success">Healthy AOV</Badge>}
           />
 
           <MetricCard
-            icon={<BoxIconLine className="size-6" />}
+            icon={<BoxIconLine className="size-6 text-slate-800 dark:text-slate-50" />}
             title="Repeat Customer Rate"
             value={`${summary.repeatCustomerRate}%`}
-            badge={<Badge color="success">Customer Retention</Badge>}
+            badge={<Badge color="success">Customer retention</Badge>}
           />
         </div>
       )}
 
-      {/* ─── Charts ───────────────────────────────────── */}
+      {/* CHARTS */}
       {data && (
-        <div className="grid gap-6">
-
-          <GlassCard title="Monthly Performance" subtitle="Revenue & order trends">
-            <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-1">
+          <GlassCard
+            title="Monthly Performance"
+            subtitle="Revenue and order trends over time."
+          >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <RevenueByMonth data={data.revenueByMonth} />
               <OrdersTrend data={data.revenueByMonth} />
             </div>
-            <AvgOrderValueChart data={data.revenueByMonth} />
+            <div className="mt-4">
+              <AvgOrderValueChart data={data.revenueByMonth} />
+            </div>
           </GlassCard>
 
-          <GlassCard title="Top Performing Products">
+          <GlassCard
+            title="Top Performing Products"
+            subtitle="Products contributing the most to revenue."
+          >
             <TopProductsChart data={data.productRevenue} />
           </GlassCard>
 
-          <GlassCard title="Top Customers">
+          <GlassCard
+            title="Top Customers"
+            subtitle="Your highest-value customers."
+          >
             <TopCustomersChart data={data.topCustomers} />
           </GlassCard>
 
-          <GlassCard title="Payment Insights">
-            <div className="grid md:grid-cols-3 gap-5">
+          <GlassCard
+            title="Payment & Geo Insights"
+            subtitle="Payment mix and revenue by state."
+          >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <PaymentTypeChart data={data.paymentType} />
               <PaymentStatusChart data={data.paymentStatus} />
               <RevenueByState data={data.revenueByState} />
@@ -189,7 +250,7 @@ export default function OrdersDashboard() {
 }
 
 /* =====================================================
-   UI COMPONENTS
+   UI COMPONENTS (SAME AS BILLING DASHBOARD)
 ===================================================== */
 type MetricCardProps = {
   icon: React.ReactNode;
@@ -210,12 +271,12 @@ function MetricCard({ icon, title, value, badge }: MetricCardProps) {
         </span>
       </div>
 
-      <div className="mt-4 flex-col items-center  gap-6">
-        <div className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 mb-4">
+      <div className="mt-4 flex-col items-center gap-6">
+        <div className="mb-4 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
           {value}
         </div>
 
-        {badge && <div className=" text-[10px] ">{badge}</div>}
+        {badge && <div className="text-[10px]">{badge}</div>}
       </div>
     </div>
   );
@@ -246,4 +307,3 @@ function GlassCard({ title, subtitle, children }: GlassCardProps) {
     </div>
   );
 }
-

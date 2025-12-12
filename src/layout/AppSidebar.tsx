@@ -55,7 +55,6 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Orders", path: "/orders", allowedRoles: ["admin", "order manager"] },
       { name: "Subscriptions", path: "/subscriptions", allowedRoles: ["admin", "order manager"] },
-      { name: "Recurring Payments", path: "/recurring-payments", allowedRoles: ["admin", "order manager"] },
       { name: "Refund", path: "/refund", allowedRoles: ["admin", "order manager"] },
       { name: "Return", path: "/return", allowedRoles: ["admin", "order manager"] },
       { name: "Repair", path: "/repair", allowedRoles: ["admin", "order manager"] },
@@ -91,7 +90,7 @@ const othersItems: NavItem[] = [];
 /* ---------------------------------- SIDEBAR ---------------------------------- */
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { isExpanded, isMobileOpen, isHovered } = useSidebar();
   const location = useLocation();
 
   /* 🔥 Role state moved inside component now works on login/logout instantly */
@@ -126,7 +125,7 @@ const AppSidebar: React.FC = () => {
       list.forEach((nav, idx) => {
         if (nav.subItems) {
           nav.subItems.forEach((s: any) => {
-            if (isActive(s.path)) { setOpenSubmenu({ type, index: idx }); match = true; }
+            if (isActive(s.path)) { setOpenSubmenu({ type: type as "main" | "others", index: idx }); match = true; }
           });
         }
       });
@@ -172,7 +171,7 @@ const AppSidebar: React.FC = () => {
           )}
 
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
-            <div ref={el => (subMenuRefs.current[`${type}-${index}`] = el)}
+            <div ref={el => { subMenuRefs.current[`${type}-${index}`] = el; }}
               className="overflow-hidden transition-all duration-300"
               style={{ height: openSubmenu?.type === type && openSubmenu?.index === index ? `${subMenuHeight[`${type}-${index}`]}px` : "0px" }}>
               <ul className="mt-2 ml-9 space-y-1">
@@ -198,11 +197,11 @@ const AppSidebar: React.FC = () => {
       transition-all duration-300 text-slate-900 dark:text-slate-100
       ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
       ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:mt-0`}>
-      
+
       <div className={`flex py-8 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link to="/">
           {(isExpanded || isHovered || isMobileOpen)
-            ? <h1 className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-transparent bg-clip-text text-2xl font-bold tracking-[0.18em]">RENTBUDDY</h1>
+            ? <h1 className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-transparent dark:text-white bg-clip-text text-2xl font-bold tracking-[0.18em]">RENTBUDDY</h1>
             : <h1 className="text-2xl font-bold tracking-[0.18em] text-slate-900 dark:text-slate-50 text-center">RB</h1>}
         </Link>
       </div>

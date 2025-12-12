@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment } from "react";
 import axios from "axios";
 import {
   Table,
@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import Button from "../ui/button/Button";
 import { toast } from "react-toastify";
 import { ChevronDown } from "lucide-react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
@@ -67,11 +66,11 @@ const TrackTableOne: React.FC = () => {
   const makeTrackingId = (name: string) =>
     name
       ? name
-          .split(" ")
-          .slice(0, 4)
-          .map((w) => w[0])
-          .join("")
-          .toUpperCase()
+        .split(" ")
+        .slice(0, 4)
+        .map((w) => w[0])
+        .join("")
+        .toUpperCase()
       : "N/A";
 
   const rows: TrackingRow[] = products.map((p) => ({
@@ -100,7 +99,7 @@ const TrackTableOne: React.FC = () => {
   return (
     <Fragment>
       <div className="rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] p-5">
-        
+
         {/* HEADER + FILTERS */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
@@ -108,7 +107,7 @@ const TrackTableOne: React.FC = () => {
           </h2>
 
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            
+
             {/* Search Input */}
             <input
               type="text"
@@ -155,7 +154,7 @@ const TrackTableOne: React.FC = () => {
                   <DropdownItem
                     key={city}
                     onItemClick={() => {
-                      setCityFilter(city);
+                      setCityFilter(city ?? "");
                       setCityDropdown(false);
                       setCurrentPage(1);
                     }}
