@@ -366,9 +366,9 @@ const ComplaintTableOne = () => {
               <Button variant="outline" onClick={closeModal}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary">
+              <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                 Save
-              </Button>
+              </button>
             </div>
           </form>
         </ModalWrapper>
@@ -389,11 +389,12 @@ const ComplaintTableOne = () => {
               Cancel
             </Button>
             <Button
-              variant="danger"
+              variant="primary"
               onClick={() => {
                 alert("Delete logic not implemented");
                 closeModal();
               }}
+              className="bg-red-600 hover:bg-red-700"
             >
               Delete
             </Button>
